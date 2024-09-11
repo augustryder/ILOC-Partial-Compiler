@@ -1,7 +1,7 @@
 # CSCI-3334 Compiler Construction
 ## Semester project: thc
 
-* Name(s):
+* Name(s): August Herron
 * Project Number: 1
 
 ### Overview
