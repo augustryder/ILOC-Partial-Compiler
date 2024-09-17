@@ -1,0 +1,37 @@
+|index| opcode ||  op1 |  op2 | dest |
+|     |        ||  sr  |  sr  |  sr  |  
+|0    | loadI  || 0    | -    | r0   |
+|1    | loadI  || 1    | -    | r1   |
+|2    | loadI  || 2    | -    | r3   |
+|3    | loadI  || 10   | -    | r2   |
+|4    | loadI  || 1024 | -    | r10  |
+|5    | store  || r3   | r10  | -    |
+|6    | add    || r0   | r0   | r4   |
+|7    | add    || r0   | r1   | r3   |
+|8    | add    || r1   | r1   | r0   |
+|9    | add    || r4   | r3   | r4   |
+|10   | add    || r3   | r1   | r3   |
+|11   | add    || r4   | r3   | r4   |
+|12   | add    || r3   | r1   | r3   |
+|13   | add    || r4   | r3   | r4   |
+|14   | add    || r3   | r1   | r3   |
+|15   | add    || r4   | r3   | r4   |
+|16   | add    || r3   | r1   | r3   |
+|17   | add    || r4   | r3   | r4   |
+|18   | add    || r3   | r1   | r3   |
+|19   | add    || r4   | r3   | r4   |
+|20   | add    || r3   | r1   | r3   |
+|21   | add    || r4   | r3   | r4   |
+|22   | add    || r3   | r1   | r3   |
+|23   | add    || r4   | r3   | r4   |
+|24   | add    || r3   | r1   | r3   |
+|25   | add    || r4   | r3   | r4   |
+|26   | add    || r3   | r1   | r3   |
+|27   | add    || r4   | r3   | r4   |
+|28   | load   || r10  | -    | r3   |
+|29   | mult   || r4   | r3   | r4   |
+|30   | add    || r10  | r2   | r10  |
+|31   | add    || r10  | r0   | r10  |
+|32   | store  || r4   | r10  | -    |
+|33   | output || 1024 | -    | -    |
+|34   | output || 1036 | -    | -    |

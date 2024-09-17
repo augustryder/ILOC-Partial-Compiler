@@ -15,13 +15,10 @@ int main(int argc, char* argv[]) {
     } else {
         pFile = fopen(options.file_name, "rb");
     }
-    while (true) {
-        char c = getc(pFile);
-        if (c == EOF) break;
-        ungetc(c, pFile);
-        Token test = s0(pFile);
-        printToken(test);
-        skipWhitespace(pFile);
+
+    while (peek(pFile) != EOF) {
+        printToken(nextToken(pFile));
     }
+
     return EXIT_SUCCESS;
 }

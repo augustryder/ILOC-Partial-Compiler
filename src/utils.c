@@ -28,7 +28,7 @@ void debug_l(char* str, int level) {
 void skipWhitespace(FILE* input){
   char c = getc(input);
   while (c != EOF) {
-    if (!isspace(c)) {
+    if (!isspace(c) && c != '\n') {
       ungetc(c, input);
       break;
     }
@@ -47,11 +47,19 @@ void skipBlankspace(FILE* input){
   }
 }
 
+bool isAlpha(char c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
+bool isNumber(char c) {
+  return c >= '0' && c <= '9';
+}
+
 bool readNumber(FILE* input, int* out){
   int retval = 0;
   while(true){
     char c = getc(input);
-    if(c > '9' || c < '0'){
+    if(!isNumber(c)){
       ungetc(c,input);
       break;
     }else{
@@ -60,4 +68,10 @@ bool readNumber(FILE* input, int* out){
   }
   *out = retval;
   return true;
+}
+
+char peek(FILE* file) {
+  char c = getc(file);
+  ungetc(c, file);
+  return c;
 }

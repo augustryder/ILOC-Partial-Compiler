@@ -2,6 +2,8 @@
 #include "token.h"
 #include "utils.h"
 
+
+Token nextToken(FILE* file);
 Token s0(FILE* file);
 Token s1(FILE* file);
 Token s2to5(FILE* file);
@@ -14,4 +16,8 @@ Token s19to18(FILE* file);
 Token s22to24(FILE* file);
 Token s25to27(FILE* file);
 Token s28to33(FILE* file);
-Token reg(FILE* file);
+
+Token getReg(FILE* file);
+Token getConst(FILE* file);
+Token getComma(FILE* file);
+Token getArrow(FILE* file);

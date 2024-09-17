@@ -4,7 +4,84 @@
 #include <stdlib.h>
 
 
-// generates token for accepting state
+Token nextToken(FILE* file) {
+    skipWhitespace(file);
+    char c = getc(file);
+    if (c == 'r') {
+        char next = peek(file);
+        if (isNumber(next)) {
+            ungetc(c, file);
+            return getReg(file);
+        } else if (isAlpha(next)) {
+            ungetc(c, file);
+            return s0(file);
+        }
+    } else if (isAlpha(c)) {
+        ungetc(c, file);
+        return s0(file);
+    } else if (isNumber(c)) {
+        ungetc(c, file);
+        return getConst(file);
+    } else if (c == ',') {
+        ungetc(c, file);
+        return getComma(file);
+    } else if (c == '=' && peek(file) == '>') {
+        ungetc(c, file);
+        return getArrow(file);
+    } else {
+        error("Invalid symbol.");
+    }
+}
+
+Token getReg(FILE* file) {
+    char c = getc(file);
+    if (c != 'r') {
+        error("Not a valid register to get.");
+    }
+    int reg_number = 0;
+    if (readNumber(file, &reg_number)) {
+        Token tok;
+        tok.category = REG;
+        tok.value.number = reg_number;
+        return tok;
+    } else {
+        error("Error reading register number.");
+    }
+}
+
+Token getConst(FILE* file) {
+    int constant = 0;
+    if (readNumber(file, &constant)) {
+        Token tok;
+        tok.category = CONST;
+        tok.value.number = constant;
+        return tok;
+    } else {
+        error("Error reading constant.");
+    }    
+}
+
+Token getComma(FILE* file) {
+    char c = getc(file);
+    if (c != ',') {
+        error("No comma to get.");
+    }
+    Token tok;
+    tok.category = COMMA;
+    return tok;
+}
+
+Token getArrow(FILE* file) {
+    char c = getc(file);
+    if (getc(file) != '>' && c != '=') {
+        error("No arrow to get.");
+    }
+    Token tok;
+    tok.category = ARROW;
+    return tok;
+}
+
+// generates token for accepting state in DFA
 Token s0(FILE* file) {
     char c = getc(file);
     if (c == EOF) {
