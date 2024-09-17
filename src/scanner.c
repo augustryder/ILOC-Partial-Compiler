@@ -59,7 +59,7 @@ Token s6to7(FILE* file) {
     if (c == 'b' && isspace(getc(file))) {
         Token tok;
         tok.category = INST;
-        tok.value.lexeme = "store";
+        tok.value.lexeme = "sub";
         return tok;
     } else {
         error("Invalid transition somewhere s2 - s5");
