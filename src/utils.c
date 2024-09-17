@@ -1,5 +1,6 @@
 #include "utils.h"
 #include <stdlib.h>
+#include <ctype.h>
 
 int debugLevel = 0; 
 
@@ -26,20 +27,20 @@ void debug_l(char* str, int level) {
 
 void skipWhitespace(FILE* input){
   char c = getc(input);
-  while(c != EOF){
-    if(!isspace(c)){
-      ungetc(c,input);
+  while (c != EOF) {
+    if (!isspace(c)) {
+      ungetc(c, input);
       break;
     }
-     c = getc(input);
+    c = getc(input);
   }
 }
 
 void skipBlankspace(FILE* input){
   char c = getc(input);
-  while(c != EOF){
-    if(c != ' ' && c != '\t'){
-      ungetc(c,input);
+  while (c != EOF) {
+    if (c != ' ' && c != '\t') {
+      ungetc(c, input);
       break;
     }
     c = getc(input);

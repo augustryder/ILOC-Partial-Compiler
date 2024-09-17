@@ -1,5 +1,7 @@
 #include "line.h"
 #include <stdlib.h>
+#include <stdio.h>
+#include "utils.h"
 
 void printLine(Line* val) {
   printf("(%d, %d)\t", val->x, val->y);

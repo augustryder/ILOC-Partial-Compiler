@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include "list.h"
+#include "utils.h"
 
 List* emptyList() {
   List* empty = (List*) malloc(sizeof(List));
