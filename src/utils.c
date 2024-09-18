@@ -55,6 +55,10 @@ bool isNumber(char c) {
   return c >= '0' && c <= '9';
 }
 
+bool isEndOfWord(char c) {
+  return isspace(c) || c == EOF;
+}
+
 bool readNumber(FILE* input, int* out){
   int retval = 0;
   while(true){

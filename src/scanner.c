@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
-
+#include "list.h"
 
 Token nextToken(FILE* file) {
     skipWhitespace(file);
@@ -118,7 +118,7 @@ Token s2to5(FILE* file) {
     if (c == EOF) {
         error("End of file s2.");
     }
-    if (c == 'o' && getc(file) == 'r' && getc(file) == 'e' && isspace(getc(file))) {
+    if (c == 'o' && getc(file) == 'r' && getc(file) == 'e' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "store";
@@ -133,7 +133,7 @@ Token s6to7(FILE* file) {
     if (c == EOF) {
         error("End of file s6.");
     }
-    if (c == 'b' && isspace(getc(file))) {
+    if (c == 'b' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "sub";
@@ -163,12 +163,12 @@ Token s9to12(FILE* file) {
     }
     if (c == 'a' && getc(file) == 'd') {
         c = getc(file);
-        if (isspace(c) || c == EOF) {
+        if (isEndOfWord(c)) {
             Token tok;
             tok.category = INST;
             tok.value.lexeme = "load";
             return tok;
-        } else if (c == 'I' && isspace(getc(file))) {
+        } else if (c == 'I' && isEndOfWord(getc(file))) {
             Token tok;
             tok.category = INST;
             tok.value.lexeme = "loadI";
@@ -186,7 +186,7 @@ Token s14to18(FILE* file) {
     if (c == EOF) {
         error("End of file s14.");
     }
-    if (c == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isspace(getc(file))) {
+    if (c == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "lshift";
@@ -201,7 +201,7 @@ Token s13to18(FILE* file) {
     if (c == EOF) {
         error("End of file s13.");
     }
-    if (c == 's' && getc(file) == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isspace(getc(file))) {
+    if (c == 's' && getc(file) == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "rshift";
@@ -216,7 +216,7 @@ Token s19to18(FILE* file) {
     if (c == EOF) {
         error("End of file s19.");
     }
-    if (c == 'u' && getc(file) == 'l' && getc(file) == 't' && isspace(getc(file))) {
+    if (c == 'u' && getc(file) == 'l' && getc(file) == 't' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "mult";
@@ -231,7 +231,7 @@ Token s22to24(FILE* file) {
     if (c == EOF) {
         error("End of file s22.");
     }
-    if (c == 'd' && getc(file) == 'd' && isspace(getc(file))) {
+    if (c == 'd' && getc(file) == 'd' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "add";
@@ -246,7 +246,7 @@ Token s25to27(FILE* file) {
     if (c == EOF) {
         error("End of file s19.");
     }
-    if (c == 'o' && getc(file) == 'p' && isspace(getc(file))) {
+    if (c == 'o' && getc(file) == 'p' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "nop";
@@ -261,7 +261,7 @@ Token s28to33(FILE* file) {
     if (c == EOF) {
         error("End of file s19.");
     }
-    if (c == 'u' && getc(file) == 't' && getc(file) == 'p' && getc(file) == 'u' && getc(file) == 't' && isspace(getc(file))) {
+    if (c == 'u' && getc(file) == 't' && getc(file) == 'p' && getc(file) == 'u' && getc(file) == 't' && isEndOfWord(getc(file))) {
         Token tok;
         tok.category = INST;
         tok.value.lexeme = "output";

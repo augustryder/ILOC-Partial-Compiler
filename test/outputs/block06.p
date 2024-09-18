@@ -21,4 +21,4 @@ load   r13          => r2
 mult   r1   , r3    => r1
 mult   r1   , r2    => r1
 store  r1           => r10
-output 1032              
+output 1032

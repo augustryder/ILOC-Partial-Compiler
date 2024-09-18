@@ -13,5 +13,6 @@ void skipWhitespace(FILE* input);
 void skipBlankspace(FILE* input);
 bool isAlpha(char c);
 bool isNumber(char c);
+bool isEndOfWord(char c);
 bool readNumber(FILE* input, int* out);
 char peek(FILE* file);
