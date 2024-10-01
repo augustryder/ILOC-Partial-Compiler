@@ -4,7 +4,7 @@
 
 List* emptyList() {
   List* empty = (List*) malloc(sizeof(List));
-  assertCondition(empty != NULL, "Memory error allocating line.");
+  assertCondition(empty != NULL, "Memory error allocating inst.");
   empty->head = NULL;
   empty->next = NULL;
   return empty;
@@ -34,7 +34,7 @@ void printList(List* lst){
   }
   List* rover = lst;
   while (rover != NULL) {
-    printLine(rover->head);
+    printInst(rover->head);
     rover = rover->next;
   }
   printf("\n");
@@ -49,16 +49,16 @@ void tPrintList(List* lst){
   printf("|    x     |    y     |\n");
   List* rover = lst;
   while (rover != NULL) {
-    tPrintLine(rover->head);
+    tPrintInst(rover->head);
     rover = rover->next;
   }
   printf("\n");
 }
 
-void append(List* lst, Line* line) {
-  assertCondition(lst != NULL && line != NULL, "Null Parameter.");
+void append(List* lst, Inst* inst) {
+  assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
-    lst->head = line;
+    lst->head = inst;
   }
   else {
     List* rover = lst;
@@ -66,18 +66,18 @@ void append(List* lst, Line* line) {
         rover = rover->next;
     }
     List* newNode = emptyList();
-    newNode->head = line;
+    newNode->head = inst;
     rover->next = newNode;
   }
 }
 
-void insert_after(List* lst, Line* line){
-  assertCondition(lst != NULL && line != NULL, "Null Parameter.");
+void insert_after(List* lst, Inst* inst){
+  assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
     error("Uh oh! You cannot insert_after on an empty list!");
   }
   List* newNode = emptyList();
-  newNode->head = line;
+  newNode->head = inst;
   if (lst->next == NULL) {
     lst->next = newNode;
   } else {
@@ -87,8 +87,8 @@ void insert_after(List* lst, Line* line){
   }
 }
 
-void insert_at(List* lst, Line* line, int idx) {
-  assertCondition(lst != NULL && line != NULL, "Null Parameter.");
+void insert_at(List* lst, Inst* inst, int idx) {
+  assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (idx > size(lst)) {
     error("Uh oh! Index out of bounds!");
   }
@@ -97,14 +97,14 @@ void insert_at(List* lst, Line* line, int idx) {
     newNode = emptyList();
     newNode->head = lst->head;
     newNode->next = lst->next;
-    lst->head = line;
+    lst->head = inst;
     lst->next = newNode;
   } else {
     List* rover = lst;
     for (int i = 0; i < idx-1; i++){
       rover = rover->next;
     }
-    insert_after(rover, line);
+    insert_after(rover, inst);
   }
 }
 
@@ -161,7 +161,7 @@ void freeList(List *lst) {
         nextNode = rover->next;  // Save the next node
 
         if (rover->head != NULL) {
-            free(rover->head);  // Free the dynamically allocated Line* in each node
+            free(rover->head);  // Free the dynamically allocated Inst* in each node
             rover->head = NULL;  // Avoid double free by setting to NULL
         }
 

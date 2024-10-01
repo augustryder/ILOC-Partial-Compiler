@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "line.h"
+#include "parser/inst.h"
 #include "args.h"
-#include "scanner.h"
+#include "lexer/scanner.c"
+#include "lexer/token.c"
 #include <string.h>
 
 int main(int argc, char* argv[]) {

@@ -57,12 +57,12 @@ bool isNumber(char c) {
 
 bool readNumber(FILE* input, int* out){
   int retval = 0;
-  while(true){
+  while(true) {
     char c = getc(input);
     if(!isNumber(c)){
       ungetc(c,input);
       break;
-    }else{
+    } else {
       retval = retval * 10 + (c - '0');
     }
   }
