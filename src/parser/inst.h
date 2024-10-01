@@ -5,13 +5,13 @@ typedef struct {
     int val;
 } Operand;
 
-typedef struct inst {
+typedef struct {
     Opcode opcode;
     Operand sr1;
     Operand sr2;
     Operand dest;
 } Inst;
 
+Inst* makeInst(Opcode opcode, Operand sr1, Operand sr2, Operand dest);
 void printInst(Inst* val);
 void tPrintInst(Inst* val);
-Inst* makeInst(Opcode opcode, Operand sr1, Operand sr2, Operand dest);

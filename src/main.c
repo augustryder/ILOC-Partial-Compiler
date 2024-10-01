@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
 
     while (peek(pFile) != EOF) {
         printToken(nextToken(pFile));
-        skipWhitespace(pFile);
+        skipBlankspace(pFile);
     }
 
     return EXIT_SUCCESS;
