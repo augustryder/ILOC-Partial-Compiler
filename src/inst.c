@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "utils.h"
-#include "../types.h"
+#include "types.h"
 
 void printInst(Inst* val) {
   printf("(%s, %d, %d, %d)\t", opToString(val->opcode), val->sr1.val, val->sr2.val, val->dest.val);
@@ -10,7 +10,7 @@ void printInst(Inst* val) {
 }
 
 void tPrintInst(Inst* val) {
-  printf("| %s | %8d | %8d | %8d |\n", opToString(val->opcode), val->sr1.val, val->sr2.val, val->dest.val);
+  printf("| %-8s | %-8d | %-8d | %-8d |\n", opToString(val->opcode), val->sr1.val, val->sr2.val, val->dest.val);
   return;
 }
 

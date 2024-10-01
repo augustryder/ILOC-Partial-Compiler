@@ -1,9 +1,9 @@
-#include "./scanner.h"
+#include "scanner.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include "token.h"
-#include "../types.h"
+#include "types.h"
 
 Token nextToken(FILE* file) {
     skipWhitespace(file);

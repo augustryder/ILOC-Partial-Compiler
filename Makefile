@@ -42,7 +42,7 @@ TEST_BINARY := $(BINARY)_test_runner
 
 # %.o file names
 NAMES := $(notdir $(basename $(wildcard $(SRCDIR)/*.$(SRCEXT))))
-OBJECTS :=$(patsubst %,$(LIBDIR)/%.o,$(NAMES))
+OBJECTS := $(patsubst %,$(LIBDIR)/%.o,$(NAMES))
 
 default: all
 

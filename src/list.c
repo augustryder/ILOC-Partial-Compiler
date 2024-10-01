@@ -46,7 +46,8 @@ void tPrintList(List* lst){
     printf("Empty List");
     return;
   }
-  printf("|    x     |    y     |\n");
+  printf("| %-8s | %-8s | %-8s | %-8s |\n", "Inst", "sr1", "sr2", "dest");
+  printf("|----------|----------|----------|----------|\n");
   List* rover = lst;
   while (rover != NULL) {
     tPrintInst(rover->head);

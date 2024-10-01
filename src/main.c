@@ -1,26 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "parser/inst.h"
-#include "args.h"
-#include "lexer/scanner.c"
-#include "lexer/token.c"
 #include <string.h>
+#include "args.h"
+#include "parse.h"
+
 
 int main(int argc, char* argv[]) {
     options_t options;
     options_parser(argc, argv, &options);
 
-    FILE* pFile;
+    FILE* file;
     if (strcmp(options.file_name, "-") == 0) {
-        pFile = stdin;
+        file = stdin;
     } else {
-        pFile = fopen(options.file_name, "rb");
+        file = fopen(options.file_name, "rb");
     }
 
-    while (peek(pFile) != EOF) {
-        printToken(nextToken(pFile));
-        skipBlankspace(pFile);
-    }
+    List* IR = parse(file);
+    tPrintList(IR);
 
     return EXIT_SUCCESS;
 }

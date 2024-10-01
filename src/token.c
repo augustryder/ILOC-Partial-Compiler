@@ -1,6 +1,6 @@
 #include "./token.h"
-#include "../utils.h"
-#include "../types.h"
+#include "utils.h"
+#include "types.h"
 
 void printToken(Token tok) {
     if (tok.category == INST) {

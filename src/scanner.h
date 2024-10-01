@@ -1,7 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include "token.h"
-#include "../utils.h"
+#include "utils.h"
 
 Token nextToken(FILE* file);
 Token s0(FILE* file);

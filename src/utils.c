@@ -39,7 +39,7 @@ void skipWhitespace(FILE* input){
 void skipBlankspace(FILE* input){
   char c = getc(input);
   while (c != EOF) {
-    if (c != ' ' && c != '\t') {
+    if (c != ' ' && c != '\t' && c != '\r') {
       ungetc(c, input);
       break;
     }
