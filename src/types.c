@@ -15,16 +15,16 @@ char* catToString(Category cat) {
 
 char* opToString(Opcode op) {
     switch (op) {
-        case LOAD: return "LOAD";
-        case LOADI: return "LOADI";
-        case STORE: return "STORE";
-        case ADD: return "ADD";
-        case SUB: return "SUB";
-        case MULT: return "MULT";
-        case LSHIFT: return "LSHIFT";
-        case RSHIFT: return "RSHIFT";
-        case OUTPUT: return "OUTPUT";
-        case NOP: return "NOP";
+        case LOAD: return "load";
+        case LOADI: return "loadI";
+        case STORE: return "store";
+        case ADD: return "add";
+        case SUB: return "sub";
+        case MULT: return "mult";
+        case LSHIFT: return "lshift";
+        case RSHIFT: return "rshift";
+        case OUTPUT: return "output";
+        case NOP: return "nop";
         default:
             error("Invalid opcode.");
     }

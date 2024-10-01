@@ -9,12 +9,12 @@
 extern int debug_level;
 
 /* Defines the command line allowed options struct */
-struct options
-{
+struct options {
+    bool lexer;
+    bool prettyPrint;
+    bool tablePrint;
     bool help;
     int debug;
-    bool use_colors;
-    bool verbose;
     char file_name[FILE_NAME_SIZE];
 };
 

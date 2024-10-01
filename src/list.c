@@ -40,7 +40,7 @@ void printList(List* lst){
   printf("\n");
 }
 
-void tPrintList(List* lst){
+void tPrintList(List* lst) {
   assertCondition(lst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
     printf("Empty List");
@@ -51,6 +51,20 @@ void tPrintList(List* lst){
   List* rover = lst;
   while (rover != NULL) {
     tPrintInst(rover->head);
+    rover = rover->next;
+  }
+  printf("\n");
+}
+
+void prettyPrintList(List* lst) {
+  assertCondition(lst != NULL, "Null Parameter.");
+  if (isEmpty(lst)) {
+    printf("Empty List");
+    return;
+  }
+  List* rover = lst;
+  while (rover != NULL) {
+    prettyPrintInst(rover->head);
     rover = rover->next;
   }
   printf("\n");

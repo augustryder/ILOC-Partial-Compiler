@@ -5,6 +5,14 @@
 #include "token.h"
 #include "types.h"
 
+
+void printTokenStream(FILE* file) {
+    while (peek(file) != EOF) {
+        printToken(nextToken(file));
+        skipWhitespace(file);
+    }
+}
+
 Token nextToken(FILE* file) {
     skipWhitespace(file);
     char c = getc(file);
@@ -36,9 +44,6 @@ Token nextToken(FILE* file) {
 
 Token getReg(FILE* file) {
     char c = getc(file);
-    if (c != 'r') {
-        error("Not a valid register to get.");
-    }
     int reg_number = 0;
     if (readNumber(file, &reg_number)) {
         Token tok;

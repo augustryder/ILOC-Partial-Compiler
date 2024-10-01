@@ -15,3 +15,4 @@ typedef struct {
 Inst* makeInst(Opcode opcode, Operand sr1, Operand sr2, Operand dest);
 void printInst(Inst* val);
 void tPrintInst(Inst* val);
+void prettyPrintInst(Inst* val);

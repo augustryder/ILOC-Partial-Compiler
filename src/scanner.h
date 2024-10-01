@@ -3,6 +3,7 @@
 #include "token.h"
 #include "utils.h"
 
+void printTokenStream(FILE* file);
 Token nextToken(FILE* file);
 Token s0(FILE* file);
 Token s1(FILE* file);

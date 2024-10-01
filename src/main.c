@@ -3,6 +3,8 @@
 #include <string.h>
 #include "args.h"
 #include "parse.h"
+#include "scanner.h"
+#include "list.h"
 
 
 int main(int argc, char* argv[]) {
@@ -17,7 +19,13 @@ int main(int argc, char* argv[]) {
     }
 
     List* IR = parse(file);
-    tPrintList(IR);
+
+    if (options.lexer) {
+        fseek(file, 0, SEEK_SET);
+        printTokenStream(file);
+    }
+    if (options.prettyPrint) prettyPrintList(IR);
+    if (options.tablePrint) tPrintList(IR);
 
     return EXIT_SUCCESS;
 }
