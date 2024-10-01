@@ -162,3 +162,4 @@ Inst* getNop(FILE* file) {
 
     return makeInst(NOP, sr1, sr2, dest);
 }
+
