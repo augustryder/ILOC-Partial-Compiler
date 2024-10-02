@@ -47,6 +47,29 @@ void skipBlankspace(FILE* input){
   }
 }
 
+void skipComment(FILE* file) {
+  char c = getc(file);
+  if (c == '/' && peek(file) == '/') {
+      while (c != '\n' && c != EOF) {
+          c = getc(file);
+      }
+  } else {
+    ungetc(c, file);
+  }
+}
+
+void skipCommentsAndWhite(FILE* file) {
+  skipWhitespace(file);
+  char c = getc(file);
+  while (c == '/' && peek(file) == '/') {
+    ungetc(c, file);
+    skipComment(file);
+    skipWhitespace(file);
+    c = getc(file);
+  }
+  ungetc(c, file);
+}
+
 bool isAlpha(char c) {
   return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }

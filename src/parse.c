@@ -6,7 +6,7 @@
 
 List* parse(FILE* file) {
     List* IR = emptyList();
-    skipWhitespace(file);
+    skipCommentsAndWhite(file);
     while (peek(file) != EOF) {
         Token tok = nextToken(file);
         if (tok.category != INST) error("Invalid instruction syntax!");
@@ -44,7 +44,7 @@ List* parse(FILE* file) {
             default:
                 error("Token contains invalid opcode.");
         }
-        skipWhitespace(file);
+        skipCommentsAndWhite(file);
     }
     return IR;
 }
@@ -57,7 +57,9 @@ Inst* getLoad(FILE* file) {
     Token r2 = nextToken(file);
     if (r2.category != REG) error("Invalid load syntax!");
     skipBlankspace(file);
-    if (peek(file) != '\n') error("Invalid load syntax!");
+    char end = getc(file);
+    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid load syntax!");
+    ungetc(end, file);
 
     Operand sr1;
     Operand sr2;
@@ -77,7 +79,9 @@ Inst* getLoadI(FILE* file) {
     Token r2 = nextToken(file);
     if (r2.category != REG) error("Invalid loadI syntax!");
     skipBlankspace(file);
-    if (peek(file) != '\n') error("Invalid loadI syntax!");
+    char end = getc(file);
+    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid loadI syntax!");
+    ungetc(end, file);
 
     Operand sr1;
     Operand sr2;
@@ -97,7 +101,9 @@ Inst* getStore(FILE* file) {
     Token r2 = nextToken(file);
     if (r2.category != REG) error("Invalid store syntax!");
     skipBlankspace(file);
-    if (peek(file) != '\n') error("Invalid store syntax!");
+    char end = getc(file);
+    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid store syntax!");
+    ungetc(end, file);
 
     Operand sr1;
     Operand sr2;
@@ -121,7 +127,9 @@ Inst* getArith(Opcode opcode, FILE* file) {
     Token r3 = nextToken(file);
     if (r3.category != REG) error("Invalid arithmetic syntax!");
     skipBlankspace(file);
-    if (peek(file) != '\n') error("Invalid arithmetic syntax!");
+    char end = getc(file);
+    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid arithmetic syntax!");
+    ungetc(end, file);
 
     Operand sr1;
     Operand sr2;
@@ -137,7 +145,9 @@ Inst* getOutput(FILE* file) {
     Token cnst = nextToken(file);
     if (cnst.category != CONST) error("Invalid output syntax!");
     skipBlankspace(file);
-    if (peek(file) != '\n') error("Invalid output syntax!");
+    char end = getc(file);
+    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid output syntax!");
+    ungetc(end, file);
 
     Operand sr1;
     Operand sr2;
@@ -151,7 +161,9 @@ Inst* getOutput(FILE* file) {
 
 Inst* getNop(FILE* file) {
     skipBlankspace(file);
-    if (peek(file) != '\n') error("Invalid nop syntax!");
+    char end = getc(file);
+    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid nop syntax!");
+    ungetc(end, file);
 
     Operand sr1;
     Operand sr2;

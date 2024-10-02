@@ -9,12 +9,12 @@
 void printTokenStream(FILE* file) {
     while (peek(file) != EOF) {
         printToken(nextToken(file));
-        skipWhitespace(file);
+        skipCommentsAndWhite(file);
     }
 }
 
 Token nextToken(FILE* file) {
-    skipWhitespace(file);
+    skipCommentsAndWhite(file);
     char c = getc(file);
     if (c == 'r') {
         char next = peek(file);
@@ -38,7 +38,7 @@ Token nextToken(FILE* file) {
         ungetc(c, file);
         return getArrow(file);
     } else {
-        error("Invalid symbol.");
+        error("Cannot read token.");
     }
 }
 

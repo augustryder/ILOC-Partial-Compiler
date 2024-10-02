@@ -1,6 +1,0 @@
-load sub 
-lshift
-rshift
-mult output store store mult
-loadI load                          
-nop add 

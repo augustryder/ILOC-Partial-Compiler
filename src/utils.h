@@ -11,6 +11,8 @@ void debug(char* str);
 void debug_l(char* str, int level);
 void skipWhitespace(FILE* input);
 void skipBlankspace(FILE* input);
+void skipComment(FILE* file);
+void skipCommentsAndWhite(FILE* file);
 bool isAlpha(char c);
 bool isNumber(char c);
 bool isEndOfWord(char c);

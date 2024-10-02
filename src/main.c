@@ -27,5 +27,6 @@ int main(int argc, char* argv[]) {
     if (options.prettyPrint) prettyPrintList(IR);
     if (options.tablePrint) tPrintList(IR);
 
+    freeList(IR);
     return EXIT_SUCCESS;
 }
