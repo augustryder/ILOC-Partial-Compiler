@@ -24,8 +24,8 @@ int main(int argc, char* argv[]) {
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
     }
-    if (options.prettyPrint) prettyPrintList(IR);
-    if (options.tablePrint) tPrintList(IR);
+    else if (options.prettyPrint) prettyPrintList(IR);
+    else if (options.tablePrint) tPrintList(IR);
 
     freeList(IR);
     return EXIT_SUCCESS;

@@ -1,0 +1,42 @@
+<INST, loadI>
+<CONST, 128>
+<ARROW>
+<REG, 0>
+<INST, load>
+<REG, 0>
+<ARROW>
+<REG, 1>
+<INST, loadI>
+<CONST, 132>
+<ARROW>
+<REG, 2>
+<INST, load>
+<REG, 2>
+<ARROW>
+<REG, 3>
+<INST, loadI>
+<CONST, 136>
+<ARROW>
+<REG, 4>
+<INST, load>
+<REG, 4>
+<ARROW>
+<REG, 5>
+<INST, mult>
+<REG, 3>
+<COMMA>
+<REG, 5>
+<ARROW>
+<REG, 3>
+<INST, add>
+<REG, 1>
+<COMMA>
+<REG, 3>
+<ARROW>
+<REG, 1>
+<INST, store>
+<REG, 1>
+<ARROW>
+<REG, 0>
+<INST, output>
+<CONST, 128>

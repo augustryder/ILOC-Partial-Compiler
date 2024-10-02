@@ -1,0 +1,106 @@
+<INST, loadI>
+<CONST, 1024>
+<ARROW>
+<REG, 8>
+<INST, loadI>
+<CONST, 1028>
+<ARROW>
+<REG, 9>
+<INST, load>
+<REG, 8>
+<ARROW>
+<REG, 8>
+<INST, load>
+<REG, 9>
+<ARROW>
+<REG, 9>
+<INST, loadI>
+<CONST, 1032>
+<ARROW>
+<REG, 10>
+<INST, loadI>
+<CONST, 1036>
+<ARROW>
+<REG, 11>
+<INST, loadI>
+<CONST, 1040>
+<ARROW>
+<REG, 12>
+<INST, loadI>
+<CONST, 1044>
+<ARROW>
+<REG, 13>
+<INST, store>
+<REG, 8>
+<ARROW>
+<REG, 10>
+<INST, add>
+<REG, 8>
+<COMMA>
+<REG, 9>
+<ARROW>
+<REG, 8>
+<INST, store>
+<REG, 8>
+<ARROW>
+<REG, 11>
+<INST, add>
+<REG, 8>
+<COMMA>
+<REG, 9>
+<ARROW>
+<REG, 8>
+<INST, store>
+<REG, 8>
+<ARROW>
+<REG, 12>
+<INST, store>
+<REG, 9>
+<ARROW>
+<REG, 13>
+<INST, load>
+<REG, 10>
+<ARROW>
+<REG, 1>
+<INST, lshift>
+<REG, 1>
+<COMMA>
+<REG, 9>
+<ARROW>
+<REG, 1>
+<INST, load>
+<REG, 11>
+<ARROW>
+<REG, 2>
+<INST, mult>
+<REG, 1>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 1>
+<INST, load>
+<REG, 12>
+<ARROW>
+<REG, 2>
+<INST, mult>
+<REG, 1>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 1>
+<INST, load>
+<REG, 13>
+<ARROW>
+<REG, 2>
+<INST, mult>
+<REG, 1>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 1>
+<INST, store>
+<REG, 1>
+<ARROW>
+<REG, 10>
+<INST, output>
+<CONST, 1032>

@@ -1,0 +1,248 @@
+<INST, loadI>
+<CONST, 0>
+<ARROW>
+<REG, 0>
+<INST, loadI>
+<CONST, 1>
+<ARROW>
+<REG, 1>
+<INST, loadI>
+<CONST, 1024>
+<ARROW>
+<REG, 50>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 1>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, lshift>
+<REG, 2>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 2>
+<INST, add>
+<REG, 0>
+<COMMA>
+<REG, 2>
+<ARROW>
+<REG, 0>
+<INST, store>
+<REG, 0>
+<ARROW>
+<REG, 50>
+<INST, loadI>
+<CONST, 17>
+<ARROW>
+<REG, 17>
+<INST, lshift>
+<REG, 1>
+<COMMA>
+<REG, 17>
+<ARROW>
+<REG, 18>
+<INST, sub>
+<REG, 18>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 19>
+<INST, loadI>
+<CONST, 4>
+<ARROW>
+<REG, 1>
+<INST, add>
+<REG, 50>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 51>
+<INST, store>
+<REG, 19>
+<ARROW>
+<REG, 51>
+<INST, output>
+<CONST, 1024>
+<INST, output>
+<CONST, 1028>

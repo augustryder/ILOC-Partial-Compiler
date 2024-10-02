@@ -1,0 +1,226 @@
+<INST, loadI>
+<CONST, 0>
+<ARROW>
+<REG, 0>
+<INST, loadI>
+<CONST, 4>
+<ARROW>
+<REG, 1>
+<INST, loadI>
+<CONST, 1024>
+<ARROW>
+<REG, 2>
+<INST, load>
+<REG, 2>
+<ARROW>
+<REG, 2>
+<INST, loadI>
+<CONST, 1028>
+<ARROW>
+<REG, 3>
+<INST, load>
+<REG, 3>
+<ARROW>
+<REG, 3>
+<INST, loadI>
+<CONST, 2000>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 2>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 2>
+<COMMA>
+<REG, 3>
+<ARROW>
+<REG, 4>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 3>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 4>
+<COMMA>
+<REG, 3>
+<ARROW>
+<REG, 5>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 4>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 5>
+<COMMA>
+<REG, 4>
+<ARROW>
+<REG, 6>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 5>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 6>
+<COMMA>
+<REG, 5>
+<ARROW>
+<REG, 7>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 6>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 7>
+<COMMA>
+<REG, 6>
+<ARROW>
+<REG, 8>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 7>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 8>
+<COMMA>
+<REG, 7>
+<ARROW>
+<REG, 9>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 8>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 9>
+<COMMA>
+<REG, 8>
+<ARROW>
+<REG, 10>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 9>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 10>
+<COMMA>
+<REG, 9>
+<ARROW>
+<REG, 11>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 10>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 11>
+<COMMA>
+<REG, 10>
+<ARROW>
+<REG, 12>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 11>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 12>
+<COMMA>
+<REG, 11>
+<ARROW>
+<REG, 13>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 12>
+<ARROW>
+<REG, 14>
+<INST, add>
+<REG, 14>
+<COMMA>
+<REG, 1>
+<ARROW>
+<REG, 14>
+<INST, store>
+<REG, 13>
+<ARROW>
+<REG, 14>
+<INST, output>
+<CONST, 2000>
+<INST, output>
+<CONST, 2004>
+<INST, output>
+<CONST, 2008>
+<INST, output>
+<CONST, 2012>
+<INST, output>
+<CONST, 2016>
+<INST, output>
+<CONST, 2020>
+<INST, output>
+<CONST, 2024>
+<INST, output>
+<CONST, 2028>
+<INST, output>
+<CONST, 2032>
+<INST, output>
+<CONST, 2036>
+<INST, output>
+<CONST, 2040>
+<INST, output>
+<CONST, 2044>
