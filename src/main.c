@@ -4,7 +4,7 @@
 #include "args.h"
 #include "parse.h"
 #include "scanner.h"
-#include "list.h"
+#include "block.h"
 
 
 int main(int argc, char* argv[]) {
@@ -18,15 +18,15 @@ int main(int argc, char* argv[]) {
         file = fopen(options.file_name, "rb");
     }
 
-    List* IR = parse(file);
+    Block* IR = parse(file);
 
     if (options.lexer) {
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
     }
-    else if (options.prettyPrint) prettyPrintList(IR);
-    else if (options.tablePrint) tPrintList(IR);
+    else if (options.prettyPrint) prettyPrintBlock(IR);
+    else if (options.tablePrint) tPrintBlock(IR);
 
-    freeList(IR);
+    freeBlock(IR);
     return EXIT_SUCCESS;
 }

@@ -1,8 +1,8 @@
 #pragma once
-#include "list.h"
+#include "block.h"
 #include <stdio.h>
 
-List* parse(FILE* file);
+Block* parse(FILE* file);
 Inst* getLoad(FILE* file);
 Inst* getLoadI(FILE* file);
 Inst* getStore(FILE* file);

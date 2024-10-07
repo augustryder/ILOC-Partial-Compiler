@@ -6,16 +6,17 @@ typedef struct {
     int sr;
     int vr;
     int pr;
+    int nu;
 } Operand;
 
 typedef struct {
     Opcode opcode;
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
+    Operand* op1;
+    Operand* op2;
+    Operand* op3;
 } Inst;
 
-Inst* makeInst(Opcode opcode, Operand sr1, Operand sr2, Operand dest);
+Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3);
 void printInst(Inst* val);
 void tPrintInst(Inst* val); //precede with a // so if you print it it still executes
 void prettyPrintInst(Inst* val); // add a selector for SR,VR,PR

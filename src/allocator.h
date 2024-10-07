@@ -1,21 +1,22 @@
 #pragma once
-#include "list.h"
+#include "block.h"
 #include "inst.h"
 
-// typedef struct {
-        int maxSR;
-        int VRNext;
-//     int* SRtoVR;
-//     int* SRtoLU;
-//     int* VRtoPR;
-// } Tables;
+typedef struct {
+    int maxSR;
+    int VRName;
+    int* SRtoVR;
+    int* SRtoLU;
+    int* VRtoPR;
+} Tables;
 
-// Computes last use, returns SRtoLU
-int* computeLastUse(List* insts, int max_reg);
-// locally allocates registers, returns VRtoPR
-int* localRegAlloc(List* insts, int k);
+// Computes last use
+void computeLastUse(Block* insts, Tables* tables);
+// locally allocates registers
+void localRegAlloc(Block* insts, int k, Tables* tables);
 
 // make helpers static?
-void update(int OP, int index, int SRtoVR[], int SRtoLU[]);
-int getPR(Inst* inst, int freePRs[], int VRtoPR[]);
+int getMaxRegister(Block* insts);
+void update(Operand* OP, int iter, Tables* tables);
+int getPR(Inst* inst, Tables* tables);
 

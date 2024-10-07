@@ -1,19 +1,19 @@
 #include <stdlib.h>
-#include "list.h"
+#include "block.h"
 #include "utils.h"
 
-List* emptyList() {
-  List* empty = (List*) malloc(sizeof(List));
+Block* emptyBlock() {
+  Block* empty = (Block*) malloc(sizeof(Block));
   assertCondition(empty != NULL, "Memory error allocating inst.");
   empty->head = NULL;
   empty->next = NULL;
   return empty;
 }
 
-int size(List* lst){
+int size(Block* lst){
   assertCondition(lst != NULL, "Null Parameter.");
   int size = 0;
-  List* rover = lst;
+  Block* rover = lst;
   while (rover != NULL) {
     size += 1;
     rover = rover->next;
@@ -21,18 +21,18 @@ int size(List* lst){
   return size;
 }
 
-bool isEmpty(List* lst){
+bool isEmpty(Block* lst){
   assertCondition(lst != NULL, "Null Parameter.");
   return lst->head == NULL;
 }
 
-void printList(List* lst){
+void printBlock(Block* lst){
   assertCondition(lst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
-    printf("Empty List");
+    printf("Empty Block");
     return;
   }
-  List* rover = lst;
+  Block* rover = lst;
   while (rover != NULL) {
     printInst(rover->head);
     rover = rover->next;
@@ -40,15 +40,15 @@ void printList(List* lst){
   printf("\n");
 }
 
-void tPrintList(List* lst) {
+void tPrintBlock(Block* lst) {
   assertCondition(lst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
-    printf("Empty List");
+    printf("Empty Block");
     return;
   }
   printf("| %-8s | %-8s | %-8s | %-8s |\n", "Inst", "sr1", "sr2", "dest");
   printf("|----------|----------|----------|----------|\n");
-  List* rover = lst;
+  Block* rover = lst;
   while (rover != NULL) {
     tPrintInst(rover->head);
     rover = rover->next;
@@ -56,13 +56,13 @@ void tPrintList(List* lst) {
   printf("\n");
 }
 
-void prettyPrintList(List* lst) {
+void prettyPrintBlock(Block* lst) {
   assertCondition(lst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
-    printf("Empty List");
+    printf("Empty Block");
     return;
   }
-  List* rover = lst;
+  Block* rover = lst;
   while (rover != NULL) {
     prettyPrintInst(rover->head);
     rover = rover->next;
@@ -70,52 +70,52 @@ void prettyPrintList(List* lst) {
   printf("\n");
 }
 
-void append(List* lst, Inst* inst) {
+void append(Block* lst, Inst* inst) {
   assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
     lst->head = inst;
   }
   else {
-    List* rover = lst;
+    Block* rover = lst;
     while (rover->next != NULL) {
         rover = rover->next;
     }
-    List* newNode = emptyList();
+    Block* newNode = emptyBlock();
     newNode->head = inst;
     rover->next = newNode;
   }
 }
 
-void insert_after(List* lst, Inst* inst){
+void insert_after(Block* lst, Inst* inst){
   assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
-    error("Uh oh! You cannot insert_after on an empty list!");
+    error("Uh oh! You cannot insert_after on an empty block!");
   }
-  List* newNode = emptyList();
+  Block* newNode = emptyBlock();
   newNode->head = inst;
   if (lst->next == NULL) {
     lst->next = newNode;
   } else {
-    List* tmp = lst->next;
+    Block* tmp = lst->next;
     lst->next = newNode;
     newNode->next = tmp;
   }
 }
 
-void insert_at(List* lst, Inst* inst, int idx) {
+void insert_at(Block* lst, Inst* inst, int idx) {
   assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (idx > size(lst)) {
     error("Uh oh! Index out of bounds!");
   }
-  List* newNode;
+  Block* newNode;
   if (idx == 0) {
-    newNode = emptyList();
+    newNode = emptyBlock();
     newNode->head = lst->head;
     newNode->next = lst->next;
     lst->head = inst;
     lst->next = newNode;
   } else {
-    List* rover = lst;
+    Block* rover = lst;
     for (int i = 0; i < idx-1; i++){
       rover = rover->next;
     }
@@ -123,12 +123,12 @@ void insert_at(List* lst, Inst* inst, int idx) {
   }
 }
 
-void remove_next(List* lst) {
+void remove_next(Block* lst) {
   assertCondition(lst != NULL, "Null Parameter.");
   if (isEmpty(lst) || lst->next == NULL) {
-    error("Uh oh! You cannot remove_next on an empty list, or at the end of a list!");
+    error("Uh oh! You cannot remove_next on an empty block, or at the end of a block!");
   }
-  List* deadNode = lst->next;
+  Block* deadNode = lst->next;
   lst->next = deadNode->next;
   if(deadNode->head == NULL){
     error("FREEING NULL");
@@ -138,14 +138,14 @@ void remove_next(List* lst) {
   free(deadNode);
 }
 
-void remove_at(List* lst, int idx) {
-  List* deadNode;
+void remove_at(Block* lst, int idx) {
+  Block* deadNode;
   assertCondition(lst != NULL, "Null Parameter.");
   if (idx >= size(lst)) {
     error("Uh oh! Index out of bounds!");
   }
   if (isEmpty(lst)) {
-    error("Uh oh! Cannot remove_at from an empty list!");
+    error("Uh oh! Cannot remove_at from an empty block!");
   }
   if (idx == 0) {
     free(lst->head);
@@ -159,7 +159,7 @@ void remove_at(List* lst, int idx) {
       free(deadNode);
     }
   } else {
-    List* rover = lst;
+    Block* rover = lst;
     for (int i = 0; i < idx-1; i++){
       rover = rover->next;
     }
@@ -168,9 +168,9 @@ void remove_at(List* lst, int idx) {
 }
 
 
-void freeList(List *lst) {
-    List *rover = lst;
-    List *nextNode;
+void freeBlock(Block *lst) {
+    Block *rover = lst;
+    Block *nextNode;
 
     while (rover != NULL) {
         nextNode = rover->next;  // Save the next node
@@ -180,7 +180,7 @@ void freeList(List *lst) {
             rover->head = NULL;  // Avoid double free by setting to NULL
         }
 
-        free(rover);             // Free the current List node
+        free(rover);             // Free the current Block node
         rover = nextNode;        // Move to the next node
     }
 }

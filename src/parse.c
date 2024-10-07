@@ -1,11 +1,11 @@
 #include "parse.h"
 #include <stdio.h>
-#include "list.h"
+#include "block.h"
 #include "utils.h"
 #include "scanner.h"
 
-List* parse(FILE* file) {
-    List* IR = emptyList();
+Block* parse(FILE* file) {
+    Block* IR = emptyBlock();
     skipCommentsAndWhite(file);
     while (peek(file) != EOF) {
         Token tok = nextToken(file);
@@ -61,14 +61,14 @@ Inst* getLoad(FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid load syntax!");
     ungetc(end, file);
 
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
-    sr1.val = r1.value.number;
-    sr2.val = -1;
-    dest.val = r2.value.number;
+    Operand op1;
+    Operand op2;
+    Operand op3;
+    op1.val = r1.value.number;
+    op2.val = -1;
+    op3.val = r2.value.number;
 
-    return makeInst(LOAD, sr1, sr2, dest);
+    return makeInst(LOAD, op1, op2, op3);
 }
 
 Inst* getLoadI(FILE* file) {
@@ -83,14 +83,14 @@ Inst* getLoadI(FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid loadI syntax!");
     ungetc(end, file);
 
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
-    sr1.val = cnst.value.number;
-    sr2.val = -1;
-    dest.val = r2.value.number;
+    Operand op1;
+    Operand op2;
+    Operand op3;
+    op1.val = cnst.value.number;
+    op2.val = -1;
+    op3.val = r2.value.number;
 
-    return makeInst(LOADI, sr1, sr2, dest);
+    return makeInst(LOADI, op1, op2, op3);
 }
 
 Inst* getStore(FILE* file) {
@@ -105,14 +105,14 @@ Inst* getStore(FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid store syntax!");
     ungetc(end, file);
 
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
-    sr1.val = r1.value.number;
-    sr2.val = r2.value.number;
-    dest.val = -1;
+    Operand op1;
+    Operand op2;
+    Operand op3;
+    op1.val = r1.value.number;
+    op2.val = r2.value.number;
+    op3.val = -1;
 
-    return makeInst(STORE, sr1, sr2, dest);
+    return makeInst(STORE, op1, op2, op3);
 }
 
 Inst* getArith(Opcode opcode, FILE* file) {
@@ -131,14 +131,14 @@ Inst* getArith(Opcode opcode, FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid arithmetic syntax!");
     ungetc(end, file);
 
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
-    sr1.val = r1.value.number;
-    sr2.val = r2.value.number;
-    dest.val = r3.value.number;
+    Operand op1;
+    Operand op2;
+    Operand op3;
+    op1.val = r1.value.number;
+    op2.val = r2.value.number;
+    op3.val = r3.value.number;
 
-    return makeInst(opcode, sr1, sr2, dest);
+    return makeInst(opcode, op1, op2, op3);
 }
 
 Inst* getOutput(FILE* file) {
@@ -149,14 +149,14 @@ Inst* getOutput(FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid output syntax!");
     ungetc(end, file);
 
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
-    sr1.val = cnst.value.number;
-    sr2.val = -1;
-    dest.val = -1;
+    Operand op1;
+    Operand op2;
+    Operand op3;
+    op1.val = cnst.value.number;
+    op2.val = -1;
+    op3.val = -1;
 
-    return makeInst(OUTPUT, sr1, sr2, dest);
+    return makeInst(OUTPUT, op1, op2, op3);
 }
 
 Inst* getNop(FILE* file) {
@@ -165,13 +165,13 @@ Inst* getNop(FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid nop syntax!");
     ungetc(end, file);
 
-    Operand sr1;
-    Operand sr2;
-    Operand dest;
-    sr1.val = -1;
-    sr2.val = -1;
-    dest.val = -1;
+    Operand op1;
+    Operand op2;
+    Operand op3;
+    op1.val = -1;
+    op2.val = -1;
+    op3.val = -1;
 
-    return makeInst(NOP, sr1, sr2, dest);
+    return makeInst(NOP, op1, op2, op3);
 }
 
