@@ -21,6 +21,7 @@ void computeLastUse(Block* block, Tables* tables) {
         SRtoLU[iter->head->op3->sr] = infinity;
         Update(iter->head->op3, i, tables);
         Update(iter->head->op3, i, tables);
+        iter = iter->next;
     }
 }
 
