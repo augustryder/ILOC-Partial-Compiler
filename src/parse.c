@@ -83,10 +83,9 @@ Inst* getLoadI(FILE* file) {
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid loadI syntax!");
     ungetc(end, file);
 
-    Operand op1;
+    Operand op1 = {.val = cnst.value.number, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
     Operand op2;
     Operand op3;
-    op1.val = cnst.value.number;
     op2.val = -1;
     op3.val = r2.value.number;
 

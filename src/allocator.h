@@ -17,6 +17,5 @@ void localRegAlloc(Block* insts, int k, Tables* tables);
 
 // make helpers static?
 int getMaxRegister(Block* insts);
-void update(Operand* OP, int iter, Tables* tables);
 int getPR(Inst* inst, Tables* tables);
 

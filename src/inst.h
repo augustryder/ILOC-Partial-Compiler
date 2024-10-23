@@ -11,9 +11,9 @@ typedef struct {
 
 typedef struct {
     Opcode opcode;
-    Operand* op1;
-    Operand* op2;
-    Operand* op3;
+    Operand op1;
+    Operand op2;
+    Operand op3;
 } Inst;
 
 Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3);

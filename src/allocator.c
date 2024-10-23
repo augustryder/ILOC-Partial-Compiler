@@ -1,31 +1,34 @@
 #include "allocator.h"
+#include "utils.h"
 
 void computeLastUse(Block* block, Tables* tables) {
     int numLines = size(block);
-    int infinity = numLines * 2;
-    int invalid = -1;
-    int MAX_REG = tables->maxSR;
-    int SRtoVR[MAX_REG];
-    int SRtoLU[MAX_REG];
+    int maxSR = getMaxRegister(block);
+    int inf = numLines * 2;
+
+    tables->SRtoVR = (int*) malloc(sizeof(int) * (maxSR + 1));
+    assertCondition(tables->SRtoVR != NULL, "Memory error allocating SRtoVR table.");
+
+    tables->SRtoLU = (int*) malloc(sizeof(int) * (maxSR + 1));
+    assertCondition(tables->SRtoLU != NULL, "Memory error allocating SRtoLU table.");
+    
     tables->VRName = 0;
-    tables->SRtoVR = SRtoVR;
-    tables->SRtoLU = SRtoLU;
-    for (int i = 0; i <= MAX_REG; ++i) {
-        SRtoVR[i] = invalid;
-        SRtoLU[i] = infinity;
+    for (int i = 0; i <= maxSR; ++i) {
+        tables->SRtoVR[i] = -1;
+        tables->SRtoLU[i] = inf;
     }
     Block* iter;
     for (int i = numLines - 1; i >= 0; --i) {
-        Update(iter->head->op3, i, tables);
-        SRtoVR[iter->head->op3->sr] = invalid;
-        SRtoLU[iter->head->op3->sr] = infinity;
-        Update(iter->head->op3, i, tables);
-        Update(iter->head->op3, i, tables);
-        iter = iter->next;
+        update(iter->head->op3, i, tables);
+        tables->SRtoVR[iter->head->op3->sr] = -1;
+        tables->SRtoLU[iter->head->op3->sr] = inf;
+        update(iter->head->op3, i, tables);
+        update(iter->head->op3, i, tables);
+        iter = iter->prev;
     }
 }
 
-int update(Operand* OP, int index, Tables* tables) {
+static int update(Operand* OP, int index, Tables* tables) {
     if (tables->SRtoVR[OP->sr] == -1) {
         tables->SRtoVR[OP->sr] = tables->VRName++;
     }

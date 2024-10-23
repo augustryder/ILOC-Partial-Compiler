@@ -39,7 +39,7 @@ void prettyPrintInst(Inst* val) {
 }
 
 Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3) {
-  Inst *val = (Inst*) malloc(sizeof(Inst));
+  Inst* val = (Inst*) malloc(sizeof(Inst));
   assertCondition(val != NULL, "Memory error allocating Inst.");
   val->opcode = opcode;
   val->op1 = op1;

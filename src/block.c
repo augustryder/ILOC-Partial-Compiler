@@ -4,7 +4,7 @@
 
 Block* emptyBlock() {
   Block* empty = (Block*) malloc(sizeof(Block));
-  assertCondition(empty != NULL, "Memory error allocating inst.");
+  assertCondition(empty != NULL, "Memory error allocating Block.");
   empty->head = NULL;
   empty->next = NULL;
   return empty;
@@ -130,16 +130,10 @@ void remove_next(Block* lst) {
   }
   Block* deadNode = lst->next;
   lst->next = deadNode->next;
-  if(deadNode->head == NULL){
-    error("FREEING NULL");
-  }else{
-  free(deadNode->head);
-  }
   free(deadNode);
 }
 
 void remove_at(Block* lst, int idx) {
-  Block* deadNode;
   assertCondition(lst != NULL, "Null Parameter.");
   if (idx >= size(lst)) {
     error("Uh oh! Index out of bounds!");
@@ -147,6 +141,7 @@ void remove_at(Block* lst, int idx) {
   if (isEmpty(lst)) {
     error("Uh oh! Cannot remove_at from an empty block!");
   }
+  Block* deadNode;
   if (idx == 0) {
     free(lst->head);
     if (lst->next == NULL) {
@@ -169,9 +164,9 @@ void remove_at(Block* lst, int idx) {
 
 
 void freeBlock(Block *lst) {
+    assertCondition(lst != NULL, "Null Paramter.");
     Block *rover = lst;
     Block *nextNode;
-
     while (rover != NULL) {
         nextNode = rover->next;  // Save the next node
 

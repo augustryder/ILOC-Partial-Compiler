@@ -16,6 +16,9 @@ int main(int argc, char* argv[]) {
         file = stdin;
     } else {
         file = fopen(options.file_name, "rb");
+        if (file == NULL) {
+            error("Unable to open file.");
+        }
     }
 
     Block* IR = parse(file);
