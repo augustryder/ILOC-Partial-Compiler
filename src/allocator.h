@@ -14,6 +14,7 @@ void computeLastUse(Block* insts, Tables* tables);
 // locally allocates registers
 void localRegAlloc(Block* insts, int k, Tables* tables);
 
+void freeTables(Tables* tables);
 // make helpers static?
 int getMaxRegister(Block* insts);
 int getPR(Inst* inst, Tables* tables);

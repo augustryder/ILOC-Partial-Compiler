@@ -57,3 +57,9 @@ void computeLastUse(Block* block, Tables* tables) {
     }
 }
 
+void freeTables(Tables* tables) {
+    free(tables->SRtoLU);
+    free(tables->SRtoVR);
+    free(tables->VRtoPR);
+}
+

@@ -34,6 +34,7 @@ int main(int argc, char* argv[]) {
     Tables tables;
     computeLastUse(IR, &tables);
     printBlock(IR);
+    freeTables(&tables);
     freeBlock(IR);
     return EXIT_SUCCESS;
 }
