@@ -49,4 +49,5 @@ void computeLastUse(Block* block, Tables* tables) {
         update(&inst->op2, i, tables);
         iter = iter->next;
     }
+    freeBlock(iter);
 }
