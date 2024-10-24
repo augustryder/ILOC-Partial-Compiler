@@ -4,8 +4,17 @@
 #include "utils.h"
 #include "types.h"
 
+void printOperand(Operand op) {
+  printf("(%d, %d, %d, %d, %d) ", op.val, op.sr, op.vr, op.pr, op.nu);
+  return;
+}
+
 void printInst(Inst* val) {
-  printf("(%s, %d, %d, %d)\t", opToString(val->opcode), val->op1.val, val->op2.val, val->op3.val);
+  printf("%s ", opToString(val->opcode));
+  printOperand(val->op1);
+  printOperand(val->op2);
+  printOperand(val->op3);
+  printf("\n");
   return;
 }
 

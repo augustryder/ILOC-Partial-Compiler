@@ -9,8 +9,9 @@ typedef struct block
     struct block* next;
 } Block;
 
-Block* emptyBlock();
+Block* emptyBlock(void);
 int size(Block* lst);
+int getMaxRegister(Block* lst);
 bool isEmpty(Block* lst);
 void printBlock(Block* lst);
 void tPrintBlock(Block* lst);

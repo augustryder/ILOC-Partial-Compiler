@@ -3,7 +3,6 @@
 #include "inst.h"
 
 typedef struct {
-    int maxSR;
     int VRName;
     int* SRtoVR;
     int* SRtoLU;

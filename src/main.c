@@ -5,6 +5,7 @@
 #include "parse.h"
 #include "scanner.h"
 #include "block.h"
+#include "allocator.h"
 
 
 int main(int argc, char* argv[]) {
@@ -30,6 +31,9 @@ int main(int argc, char* argv[]) {
     else if (options.prettyPrint) prettyPrintBlock(IR);
     else if (options.tablePrint) tPrintBlock(IR);
 
+    Tables tables;
+    computeLastUse(IR, &tables);
+    printBlock(IR);
     freeBlock(IR);
     return EXIT_SUCCESS;
 }

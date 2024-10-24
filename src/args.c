@@ -93,7 +93,7 @@ void options_parser (int argc, char* argv[], options_t* options) {
     debug_level = options->debug;
 }
 
-void help() {
+void help(void) {
     fprintf(stdout, __PROGRAM_NAME__ "\n\n");
     fprintf(stdout, "Usage: ");
     fprintf(stdout, "%s [options] input file\n\n", __PROGRAM_NAME__);

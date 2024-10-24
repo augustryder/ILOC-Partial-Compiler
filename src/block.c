@@ -2,7 +2,7 @@
 #include "block.h"
 #include "utils.h"
 
-Block* emptyBlock() {
+Block* emptyBlock(void) {
   Block* empty = (Block*) malloc(sizeof(Block));
   assertCondition(empty != NULL, "Memory error allocating Block.");
   empty->head = NULL;
@@ -19,6 +19,18 @@ int size(Block* lst){
     rover = rover->next;
   }
   return size;
+}
+
+int getMaxRegister(Block* block) {
+  int max = -1;
+  Block* rover = block;
+  while (rover != NULL) {
+    if (rover->head->op1.sr > max) max = rover->head->op1.sr;
+    if (rover->head->op2.sr > max) max = rover->head->op2.sr;
+    if (rover->head->op3.sr > max) max = rover->head->op3.sr;
+    rover = rover->next; 
+  }
+  return max;
 }
 
 bool isEmpty(Block* lst){
@@ -104,16 +116,20 @@ void insert_after(Block* lst, Inst* inst){
 
 void insert_at(Block* lst, Inst* inst, int idx) {
   assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
-  if (idx > size(lst)) {
+  if (idx >= size(lst)) {
     error("Uh oh! Index out of bounds!");
   }
   Block* newNode;
   if (idx == 0) {
-    newNode = emptyBlock();
-    newNode->head = lst->head;
-    newNode->next = lst->next;
-    lst->head = inst;
-    lst->next = newNode;
+    if (isEmpty(lst)) {
+      lst->head = inst;
+    } else {
+      newNode = emptyBlock();
+      newNode->head = lst->head;
+      newNode->next = lst->next;
+      lst->head = inst;
+      lst->next = newNode;
+    }
   } else {
     Block* rover = lst;
     for (int i = 0; i < idx-1; i++){
