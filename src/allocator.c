@@ -32,14 +32,14 @@ void computeLastUse(Block* block, Tables* tables) {
     }
 
     // lazy way to get reversed list
-    Block* iter = emptyBlock();
+    Block* reversed = emptyBlock();
     Block* rover = block;
     for (int i = 0; i < numLines; ++i) {
-        insert_at(iter, rover->head, 0);
+        insert_at(reversed, rover->head, 0);
         rover = rover->next;
     }
     // 
-
+    Block* iter = reversed;
     for (int i = numLines - 1; i >= 0; --i) {
         Inst* inst = iter->head;
         update(&inst->op3, i, tables);
@@ -49,5 +49,11 @@ void computeLastUse(Block* block, Tables* tables) {
         update(&inst->op2, i, tables);
         iter = iter->next;
     }
-    freeBlock(iter);
+
+    while (reversed != NULL) {
+        Block* nextNode = reversed->next;  // Save the next node
+        free(reversed);             // Free the current Block node
+        reversed  = nextNode;        // Move to the next node
+    }
 }
+
