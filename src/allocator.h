@@ -12,6 +12,7 @@ typedef struct {
     int* PRtoVR;
     int* PRtoNU;
     int* VRtoSL;
+    int spillLoc;
 } Tables;
 
 typedef struct {

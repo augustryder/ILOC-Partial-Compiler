@@ -70,7 +70,7 @@ int computeLastUse(Block* block, Tables* tables) {
     return tables->MAXLIVE;
 }
 
-static int getPR(Inst* inst, Stack* freePRs, Tables* tables) {
+static int getPR(Block* prevInst, Stack* freePRs, Tables* tables) {
     int k = freePRs->size;
     if (freePRs->top < k) {
         return freePRs->stack[freePRs->top++];
@@ -82,8 +82,32 @@ static int getPR(Inst* inst, Stack* freePRs, Tables* tables) {
                 x = i;
             }
         }
-        // insert spill isntructions for x
-        // Update tables, mem loc for x, and tag x as spilt
+
+        // insert spill instructions for x
+        // A loadI to put the spill location’s address into the reserved register
+        // A store to move the spilled value from its PR into its spill location
+        Operand op1 = {.val = tables->spillLoc, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+        Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+        Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+        Inst* loadI = makeInst(LOADI, op1, op2, op3);
+
+        Operand op4 = {.val = -1, .sr = -1, .vr = tables->PRtoVR[x], .pr = x, .nu = -1};
+        Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+        Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+        Inst* store = makeInst(STORE, op4, op5, op6);
+
+        insert_after(prevInst, store);
+        insert_after(prevInst, loadI);
+
+        // Update tables, mem loc for x's vr
+        tables->VRtoPR[tables->PRtoVR[x]] = -1;
+        tables->VRtoSL[tables->PRtoVR[x]] = tables->spillLoc;
+        tables->PRtoVR[x] = -1;
+        tables->spillLoc += 4;
+
+        // make sure op1 and op2 don't both choose x 
+        tables->PRtoNU[x] = -1;
+
         return x;
     }
 }
@@ -95,7 +119,7 @@ void localRegAlloc(Block* block, int k) {
     int inf = numLines * 2;
 
     int MAXLIVE = computeLastUse(block, &tables);
-    if (MAXLIVE > k) k--;
+    if (MAXLIVE >= k) k--;
 
     // Initialize freePRs
     Stack freePRs;
@@ -119,6 +143,8 @@ void localRegAlloc(Block* block, int k) {
     tables.VRtoSL = (int*) malloc(sizeof(int) * (tables.VRName + 1));
     assertCondition(tables.VRtoSL != NULL, "Memory error allocating VRtoSL table.");
 
+    tables.spillLoc = 372768;
+
     for (int i = 0; i <= tables.VRName; ++i) {
         tables.VRtoPR[i] = -1;
         tables.VRtoSL[i] = -1;
@@ -128,64 +154,107 @@ void localRegAlloc(Block* block, int k) {
         tables.PRtoNU[i] = -1;
     }
 
+    Block* prevInst = NULL;
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
             if (tables.VRtoPR[inst->op1.vr] == -1) {
-                tables.VRtoPR[inst->op1.vr] = getPR(inst, &freePRs, &tables);
+                tables.VRtoPR[inst->op1.vr] = getPR(prevInst, &freePRs, &tables);
                 if (tables.VRtoSL[inst->op1.vr] != -1) {
                     // RESTORE op1.vr
+                    // A loadI to put the spill location’s address into the reserved register
+                    // A load to retrieve the spilled value from its spill location into its new PR
+                    Operand op1 = {.val = tables.VRtoSL[inst->op1.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                    Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                    Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                    Inst* loadI = makeInst(LOADI, op1, op2, op3);
+
+                    Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                    Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                    Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
+                    Inst* load = makeInst(LOAD, op4, op5, op6);
+
+                    insert_after(prevInst, loadI);
+                    insert_after(prevInst, load);
+
                 }
             }
-            inst->op1.pr = tables.VRtoPR[inst->op1.vr];        
+            inst->op1.pr = tables.VRtoPR[inst->op1.vr];    
+            tables.PRtoVR[inst->op1.pr] = inst->op1.vr;    
         }
-
 
         // Assign OP2.PR
         if (inst->op2.vr != -1) {
             if (tables.VRtoPR[inst->op2.vr] == -1) {
-                tables.VRtoPR[inst->op2.vr] = getPR(inst, &freePRs, &tables);
+                tables.VRtoPR[inst->op2.vr] = getPR(prevInst, &freePRs, &tables);
                 if (tables.VRtoSL[inst->op2.vr] != -1) {
                     // RESTORE op2.vr
+                    // A loadI to put the spill location’s address into the reserved register
+                    // A load to retrieve the spilled value from its spill location into its new PR
+                    Operand op1 = {.val = tables.VRtoSL[inst->op2.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                    Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                    Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                    Inst* loadI = makeInst(LOADI, op1, op2, op3);
+
+                    Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                    Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                    Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op2.vr], .nu = -1};
+                    Inst* load = makeInst(LOAD, op4, op5, op6);
+
+                    insert_after(prevInst, load);
+                    insert_after(prevInst, loadI);
                 }
             }
             inst->op2.pr = tables.VRtoPR[inst->op2.vr];
+            tables.PRtoVR[inst->op2.pr] = inst->op2.vr;   
         }
         
         if (inst->op1.pr != -1) {
             if (inst->op1.nu == inf) {
                 // push tables.VRtoPR[inst->op1.vr] onto FreePRs
                 freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op1.vr];
+                tables.PRtoVR[tables.VRtoPR[inst->op1.vr]] = -1;
                 tables.VRtoPR[inst->op1.vr] = -1;
+                tables.PRtoNU[inst->op1.pr] = inf;
+            } else {
+                tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
             }
-            tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
         }
 
         if (inst->op2.pr != -1) {
             if (inst->op2.nu == inf) {
                 // push tables.VRtoPR[inst->op1.vr] onto FreePRs
-                 freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op2.vr];
+                freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op2.vr];
+                tables.PRtoVR[tables.VRtoPR[inst->op2.vr]] = -1;
                 tables.VRtoPR[inst->op2.vr] = -1;
+                tables.PRtoNU[inst->op2.pr] = inf;
+            } else {
+                 tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
             }
-            tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
         }
 
         if (inst->op3.vr != -1) {
-            tables.VRtoPR[inst->op3.vr] = getPR(inst, &freePRs, &tables);
+            tables.VRtoPR[inst->op3.vr] = getPR(prevInst, &freePRs, &tables);
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
+            tables.PRtoVR[inst->op3.pr] = inst->op3.vr;   
             tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
         }
+        
+        prevInst = rover;
     }
 
+    // free things
+    free(freePRs.stack);
+    freeTables(&tables);
 }
 
 void freeTables(Tables* tables) {
     free(tables->SRtoLU);
     free(tables->SRtoVR);
     free(tables->VRtoPR);
-    free(tables->VRtoPR);
+    free(tables->PRtoVR);
     free(tables->PRtoNU);
     free(tables->VRtoSL);
 }
