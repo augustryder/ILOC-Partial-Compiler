@@ -31,11 +31,10 @@ int main(int argc, char* argv[]) {
     else if (options.prettyPrint) prettyPrintBlock(IR);
     else if (options.tablePrint) tPrintBlock(IR);
 
-    Tables tables;
-    computeLastUse(IR, &tables);
+    int MAXLIVE = computeLastUse(IR);
+    printf("k = %d\n", MAXLIVE);
     printBlock(IR);
     
-    freeTables(&tables);
     freeBlock(IR);
     fclose(file);
     return EXIT_SUCCESS;
