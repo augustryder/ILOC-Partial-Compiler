@@ -132,42 +132,53 @@ void localRegAlloc(Block* block, int k) {
         Inst* inst = rover->head;
 
         // Assign OP1.PR
-        if (tables.VRtoPR[inst->op1.vr] == -1) {
-            tables.VRtoPR[inst->op1.vr] = getPR(inst, &freePRs, &tables);
-            if (tables.VRtoSL[inst->op1.vr] != -1) {
-                // RESTORE op1.vr
+        if (inst->op1.vr != -1) {
+            if (tables.VRtoPR[inst->op1.vr] == -1) {
+                tables.VRtoPR[inst->op1.vr] = getPR(inst, &freePRs, &tables);
+                if (tables.VRtoSL[inst->op1.vr] != -1) {
+                    // RESTORE op1.vr
+                }
             }
+            inst->op1.pr = tables.VRtoPR[inst->op1.vr];        
         }
-        inst->op1.pr = tables.VRtoPR[inst->op1.vr];
+
 
         // Assign OP2.PR
-        if (tables.VRtoPR[inst->op2.vr] == -1) {
-            tables.VRtoPR[inst->op2.vr] = getPR(inst, &freePRs, &tables);
-            if (tables.VRtoSL[inst->op2.vr] != -1) {
-                // RESTORE op2.vr
+        if (inst->op2.vr != -1) {
+            if (tables.VRtoPR[inst->op2.vr] == -1) {
+                tables.VRtoPR[inst->op2.vr] = getPR(inst, &freePRs, &tables);
+                if (tables.VRtoSL[inst->op2.vr] != -1) {
+                    // RESTORE op2.vr
+                }
             }
+            inst->op2.pr = tables.VRtoPR[inst->op2.vr];
         }
-        inst->op2.pr = tables.VRtoPR[inst->op2.vr];
-
         
-        if (inst->op1.nu == inf) {
-            // push tables.VRtoPR[inst->op1.vr] onto FreePRs
-            tables.VRtoPR[inst->op1.vr] = -1;
+        if (inst->op1.pr != -1) {
+            if (inst->op1.nu == inf) {
+                // push tables.VRtoPR[inst->op1.vr] onto FreePRs
+                freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op1.vr];
+                tables.VRtoPR[inst->op1.vr] = -1;
+            }
+            tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
         }
-        tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
 
-        if (inst->op2.nu == inf) {
-            // push tables.VRtoPR[inst->op1.vr] onto FreePRs
-            tables.VRtoPR[inst->op2.vr] = -1;
+        if (inst->op2.pr != -1) {
+            if (inst->op2.nu == inf) {
+                // push tables.VRtoPR[inst->op1.vr] onto FreePRs
+                 freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op2.vr];
+                tables.VRtoPR[inst->op2.vr] = -1;
+            }
+            tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
         }
-        tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
 
-        tables.VRtoPR[inst->op3.vr] = getPR(inst, &freePRs, &tables);
-        inst->op3.pr = tables.VRtoPR[inst->op3.vr];
-        tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
+        if (inst->op3.vr != -1) {
+            tables.VRtoPR[inst->op3.vr] = getPR(inst, &freePRs, &tables);
+            inst->op3.pr = tables.VRtoPR[inst->op3.vr];
+            tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
+        }
     }
 
-    freeTables(&tables);
 }
 
 void freeTables(Tables* tables) {

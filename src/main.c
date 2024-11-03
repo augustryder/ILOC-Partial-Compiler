@@ -31,9 +31,7 @@ int main(int argc, char* argv[]) {
     else if (options.prettyPrint) prettyPrintBlock(IR);
     else if (options.tablePrint) tPrintBlock(IR);
 
-    Tables tables;
-    int MAXLIVE = computeLastUse(IR, &tables);
-    printf("k = %d\n", MAXLIVE);
+    localRegAlloc(IR, 4);
     printBlock(IR);
     
     freeBlock(IR);
