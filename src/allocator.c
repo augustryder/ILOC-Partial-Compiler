@@ -46,14 +46,14 @@ int computeLastUse(Block* block, Tables* tables) {
     Block* iter = reversed;
     for (int i = numLines - 1; i >= 0; --i) {
         Inst* inst = iter->head;
-        update(&inst->op3, i, &tables);
+        update(&inst->op3, i, tables);
         if (inst->op3.sr != -1) {
             if (tables->SRtoVR[inst->op3.sr] != -1) tables->live--;
             tables->SRtoVR[inst->op3.sr] = -1;
             tables->SRtoLU[inst->op3.sr] = inf;
         }
-        update(&inst->op1, i, &tables);
-        update(&inst->op2, i, &tables);
+        update(&inst->op1, i, tables);
+        update(&inst->op2, i, tables);
         if (tables->live > tables->MAXLIVE) {
             tables->MAXLIVE = tables->live;
         }
@@ -70,20 +70,43 @@ int computeLastUse(Block* block, Tables* tables) {
     return tables->MAXLIVE;
 }
 
-void freeTables(Tables* tables) {
-    free(tables->SRtoLU);
-    free(tables->SRtoVR);
-    free(tables->VRtoPR);
-    free(tables->VRtoPR);
-    free(tables->PRtoNU);
-    free(tables->VRtoSL);
+static int getPR(Inst* inst, Stack* freePRs, Tables* tables) {
+    int k = freePRs->size;
+    if (freePRs->top < k) {
+        return freePRs->stack[freePRs->top++];
+    } else {
+        // get PR with furthest NU
+        int x = 0;
+        for (int i = 0; i < k; ++i) {
+            if (tables->PRtoNU[i] > tables->PRtoNU[x]) {
+                x = i;
+            }
+        }
+        // insert spill isntructions for x
+        // Update tables, mem loc for x, and tag x as spilt
+        return x;
+    }
 }
 
-void localRegAlloc(Block* insts, int k) {
+void localRegAlloc(Block* block, int k) {
     Tables tables;
-    
-    int MAXLIVE = computeLastUse(insts, &tables);
 
+    int numLines = size(block);
+    int inf = numLines * 2;
+
+    int MAXLIVE = computeLastUse(block, &tables);
+    if (MAXLIVE > k) k--;
+
+    // Initialize freePRs
+    Stack freePRs;
+    freePRs.size = k;
+    freePRs.top = 0;
+    freePRs.stack = (int*) malloc(sizeof(int) * k);
+    for (int i = 0; i < k; ++i) {
+        freePRs.stack[i] = i;
+    }
+
+    // Initialize tables
     tables.VRtoPR = (int*) malloc(sizeof(int) * (tables.VRName + 1));
     assertCondition(tables.VRtoPR != NULL, "Memory error allocating VRtoPR table.");
 
@@ -96,11 +119,62 @@ void localRegAlloc(Block* insts, int k) {
     tables.VRtoSL = (int*) malloc(sizeof(int) * (tables.VRName + 1));
     assertCondition(tables.VRtoSL != NULL, "Memory error allocating VRtoSL table.");
 
+    for (int i = 0; i <= tables.VRName; ++i) {
+        tables.VRtoPR[i] = -1;
+        tables.VRtoSL[i] = -1;
+    }
+    for (int i = 0; i < k; ++i) {
+        tables.PRtoVR[i] = -1;
+        tables.PRtoNU[i] = -1;
+    }
 
+    for (Block* rover = block; rover != NULL; rover = rover->next) {
+        Inst* inst = rover->head;
 
+        // Assign OP1.PR
+        if (tables.VRtoPR[inst->op1.vr] == -1) {
+            tables.VRtoPR[inst->op1.vr] = getPR(inst, &freePRs, &tables);
+            if (tables.VRtoSL[inst->op1.vr] != -1) {
+                // RESTORE op1.vr
+            }
+        }
+        inst->op1.pr = tables.VRtoPR[inst->op1.vr];
 
+        // Assign OP2.PR
+        if (tables.VRtoPR[inst->op2.vr] == -1) {
+            tables.VRtoPR[inst->op2.vr] = getPR(inst, &freePRs, &tables);
+            if (tables.VRtoSL[inst->op2.vr] != -1) {
+                // RESTORE op2.vr
+            }
+        }
+        inst->op2.pr = tables.VRtoPR[inst->op2.vr];
 
+        
+        if (inst->op1.nu == inf) {
+            // push tables.VRtoPR[inst->op1.vr] onto FreePRs
+            tables.VRtoPR[inst->op1.vr] = -1;
+        }
+        tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
 
+        if (inst->op2.nu == inf) {
+            // push tables.VRtoPR[inst->op1.vr] onto FreePRs
+            tables.VRtoPR[inst->op2.vr] = -1;
+        }
+        tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
 
+        tables.VRtoPR[inst->op3.vr] = getPR(inst, &freePRs, &tables);
+        inst->op3.pr = tables.VRtoPR[inst->op3.vr];
+        tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
+    }
+
+    freeTables(&tables);
 }
 
+void freeTables(Tables* tables) {
+    free(tables->SRtoLU);
+    free(tables->SRtoVR);
+    free(tables->VRtoPR);
+    free(tables->VRtoPR);
+    free(tables->PRtoNU);
+    free(tables->VRtoSL);
+}
