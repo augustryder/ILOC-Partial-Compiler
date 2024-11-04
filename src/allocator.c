@@ -119,7 +119,7 @@ void localRegAlloc(Block* block, int k) {
     int inf = numLines * 2;
 
     int MAXLIVE = computeLastUse(block, &tables);
-    if (MAXLIVE >= k) k--;
+    if (MAXLIVE > k) k--;
 
     // Initialize freePRs
     Stack freePRs;
