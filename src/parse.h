@@ -3,9 +3,9 @@
 #include <stdio.h>
 
 Block* parse(FILE* file);
-Inst* getLoad(FILE* file);
-Inst* getLoadI(FILE* file);
-Inst* getStore(FILE* file);
-Inst* getArith(Opcode opcode, FILE* file);
-Inst* getOutput(FILE* file);
-Inst* getNop(FILE* file);
+Inst* getLoad(FILE* file, int index);
+Inst* getLoadI(FILE* file, int index);
+Inst* getStore(FILE* file, int index);
+Inst* getArith(Opcode opcode, FILE* file, int index);
+Inst* getOutput(FILE* file, int index);
+Inst* getNop(FILE* file, int index);

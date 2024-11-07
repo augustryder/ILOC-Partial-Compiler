@@ -22,19 +22,22 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    Block* IR = parse(file);
+    Block* block = parse(file);
 
     if (options.lexer) {
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
     }
-    else if (options.prettyPrint) prettyPrintBlock(IR);
-    else if (options.tablePrint) tPrintBlock(IR);
+    else if (options.prettyPrint == 1) prettyPrintBlock(block);
+    else if (options.tablePrint) tPrintBlock(block);
 
-    localRegAlloc(IR, 4);
-    printBlock(IR);
+    if (options.alloc) {
+        localRegAlloc(block, 3);
+    }
+    if (options.prettyPrint == 1) prettyPrintBlock(block);
+    else if (options.tablePrint) tPrintBlock(block);
     
-    freeBlock(IR);
+    freeBlock(block);
     fclose(file);
     return EXIT_SUCCESS;
 }

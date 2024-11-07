@@ -58,8 +58,13 @@ void tPrintBlock(Block* lst) {
     printf("Empty Block");
     return;
   }
-  printf("| %-8s | %-8s | %-8s | %-8s |\n", "Inst", "sr1", "sr2", "dest");
-  printf("|----------|----------|----------|----------|\n");
+  printf("| %-6s | %-6s | %-42s || %-42s || %-42s |\n", "Index", "OP", "OP1", "OP2", "OP3");
+  printf("| %-6s | %-6s | %-6s | %-6s | %-6s | %-6s | %-6s |", " ", " ", "Val", "SR", "VR", "PR", "NU");
+  printf("| %-6s | %-6s | %-6s | %-6s | %-6s |", "Val", "SR", "VR", "PR", "NU");
+  printf("| %-6s | %-6s | %-6s | %-6s | %-6s |\n", "Val", "SR", "VR", "PR", "NU");
+  printf("|--------|--------|--------|--------|--------|--------|--------|"
+                           "|--------|--------|--------|--------|--------|"
+                           "|--------|--------|--------|--------|--------|\n");
   Block* rover = lst;
   while (rover != NULL) {
     tPrintInst(rover->head);

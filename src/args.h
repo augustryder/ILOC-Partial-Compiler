@@ -11,7 +11,8 @@ extern int debug_level;
 /* Defines the command line allowed options struct */
 struct options {
     bool lexer;
-    bool prettyPrint;
+    bool alloc;
+    int prettyPrint;
     bool tablePrint;
     bool help;
     int debug;

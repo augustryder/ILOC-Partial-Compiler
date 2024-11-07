@@ -4,42 +4,44 @@
 #include "utils.h"
 #include "scanner.h"
 
+
 Block* parse(FILE* file) {
     Block* IR = emptyBlock();
+    int index = 0;
     skipCommentsAndWhite(file);
     while (peek(file) != EOF) {
         Token tok = nextToken(file);
         if (tok.category != INST) error("Invalid instruction syntax!");
         switch (tok.value.opcode) {
             case LOAD:
-                append(IR, getLoad(file));
+                append(IR, getLoad(file, index++));
                 break;
             case LOADI:
-                append(IR, getLoadI(file));
+                append(IR, getLoadI(file, index++));
                 break;
             case STORE:
-                append(IR, getStore(file));
+                append(IR, getStore(file, index++));
                 break;
             case ADD:
-                append(IR, getArith(ADD, file));
+                append(IR, getArith(ADD, file, index++));
                 break;
             case SUB:
-                append(IR, getArith(SUB, file));
+                append(IR, getArith(SUB, file, index++));
                 break;
             case MULT:
-                append(IR, getArith(MULT, file));
+                append(IR, getArith(MULT, file, index++));
                 break;
             case LSHIFT:
-                append(IR, getArith(LSHIFT, file));
+                append(IR, getArith(LSHIFT, file, index++));
                 break;
             case RSHIFT:
-                append(IR, getArith(RSHIFT, file));
+                append(IR, getArith(RSHIFT, file, index++));
                 break;
             case OUTPUT:
-                append(IR, getOutput(file));
+                append(IR, getOutput(file, index++));
                 break;
             case NOP:
-                append(IR, getNop(file));
+                append(IR, getNop(file, index++));
                 break;
             default:
                 error("Token contains invalid opcode.");
@@ -49,7 +51,7 @@ Block* parse(FILE* file) {
     return IR;
 }
 
-Inst* getLoad(FILE* file) {
+Inst* getLoad(FILE* file, int index) {
     Token r1 = nextToken(file);
     if (r1.category != REG) error("Invalid load syntax!");
 
@@ -83,10 +85,10 @@ Inst* getLoad(FILE* file) {
                    .nu = -1};
 
 
-    return makeInst(LOAD, op1, op2, op3);
+    return makeInst(LOAD, op1, op2, op3, index);
 }
 
-Inst* getLoadI(FILE* file) {
+Inst* getLoadI(FILE* file, int index) {
     Token cnst = nextToken(file);
     if (cnst.category != CONST) error("Invalid loadI syntax!");
 
@@ -119,10 +121,10 @@ Inst* getLoadI(FILE* file) {
                    .pr = -1, 
                    .nu = -1};
 
-    return makeInst(LOADI, op1, op2, op3);
+    return makeInst(LOADI, op1, op2, op3, index);
 }
 
-Inst* getStore(FILE* file) {
+Inst* getStore(FILE* file, int index) {
     Token r1 = nextToken(file);
     if (r1.category != REG) error("Invalid store syntax!");
 
@@ -155,10 +157,10 @@ Inst* getStore(FILE* file) {
                    .pr = -1, 
                    .nu = -1};
 
-    return makeInst(STORE, op1, op2, op3);
+    return makeInst(STORE, op1, op2, op3, index);
 }
 
-Inst* getArith(Opcode opcode, FILE* file) {
+Inst* getArith(Opcode opcode, FILE* file, int index) {
     Token r1 = nextToken(file);
     if (r1.category != REG) error("Invalid arithmetic syntax!");
 
@@ -197,10 +199,10 @@ Inst* getArith(Opcode opcode, FILE* file) {
                    .pr = -1, 
                    .nu = -1};
 
-    return makeInst(opcode, op1, op2, op3);
+    return makeInst(opcode, op1, op2, op3, index);
 }
 
-Inst* getOutput(FILE* file) {
+Inst* getOutput(FILE* file, int index) {
     Token cnst = nextToken(file);
     if (cnst.category != CONST) error("Invalid output syntax!");
     
@@ -227,10 +229,10 @@ Inst* getOutput(FILE* file) {
                    .pr = -1, 
                    .nu = -1};
 
-    return makeInst(OUTPUT, op1, op2, op3);
+    return makeInst(OUTPUT, op1, op2, op3, index);
 }
 
-Inst* getNop(FILE* file) {
+Inst* getNop(FILE* file, int index) {
     skipBlankspace(file);
     char end = getc(file);
     if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid nop syntax!");
@@ -254,6 +256,6 @@ Inst* getNop(FILE* file) {
                    .pr = -1, 
                    .nu = -1};
 
-    return makeInst(NOP, op1, op2, op3);
+    return makeInst(NOP, op1, op2, op3, index);
 }
 

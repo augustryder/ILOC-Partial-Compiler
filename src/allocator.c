@@ -89,12 +89,12 @@ static int getPR(Block* prevInst, Stack* freePRs, Tables* tables) {
         Operand op1 = {.val = tables->spillLoc, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
         Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
         Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-        Inst* loadI = makeInst(LOADI, op1, op2, op3);
+        Inst* loadI = makeInst(LOADI, op1, op2, op3, -1);
 
         Operand op4 = {.val = -1, .sr = -1, .vr = tables->PRtoVR[x], .pr = x, .nu = -1};
         Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
         Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-        Inst* store = makeInst(STORE, op4, op5, op6);
+        Inst* store = makeInst(STORE, op4, op5, op6, -1);
 
         insert_after(prevInst, store);
         insert_after(prevInst, loadI);
@@ -122,10 +122,7 @@ void localRegAlloc(Block* block, int k) {
     if (MAXLIVE > k) k--;
 
     // Initialize freePRs
-    Stack freePRs;
-    freePRs.size = k;
-    freePRs.top = 0;
-    freePRs.stack = (int*) malloc(sizeof(int) * k);
+    Stack freePRs = {.size = k, .top = 0, .stack = (int*) malloc(sizeof(int) * k)};
     for (int i = 0; i < k; ++i) {
         freePRs.stack[i] = i;
     }
@@ -169,12 +166,12 @@ void localRegAlloc(Block* block, int k) {
                     Operand op1 = {.val = tables.VRtoSL[inst->op1.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
                     Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
                     Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Inst* loadI = makeInst(LOADI, op1, op2, op3);
+                    Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
                     Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
                     Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
                     Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
-                    Inst* load = makeInst(LOAD, op4, op5, op6);
+                    Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
                     insert_after(prevInst, loadI);
                     insert_after(prevInst, load);
@@ -196,12 +193,12 @@ void localRegAlloc(Block* block, int k) {
                     Operand op1 = {.val = tables.VRtoSL[inst->op2.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
                     Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
                     Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Inst* loadI = makeInst(LOADI, op1, op2, op3);
+                    Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
                     Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
                     Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
                     Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op2.vr], .nu = -1};
-                    Inst* load = makeInst(LOAD, op4, op5, op6);
+                    Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
                     insert_after(prevInst, load);
                     insert_after(prevInst, loadI);

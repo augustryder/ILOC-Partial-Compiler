@@ -3,14 +3,16 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include "utils.h"
 
 /*
  * Sets the default options
  */
 static void set_default_options(options_t* options) {
     options->lexer = false;
-    options->prettyPrint = false;
-    options->tablePrint = true;
+    options->alloc = false;
+    options->prettyPrint = 0;
+    options->tablePrint = false;
     options->help = false;
     options->debug = 0;
 }
@@ -25,8 +27,15 @@ static void switch_options(int arg, options_t* options) {
         case 'l':
             options->lexer = true;
             break;
+        case 'a':
+            options->alloc = true;
+            break;
         case 'p':
-            options->prettyPrint = true;
+            if (optarg) {
+                options->prettyPrint = atoi(optarg);
+            } else {
+                error("Error: -p option requires an argument.");
+            }
             break;
         case 't':
             options->tablePrint = true;
@@ -37,7 +46,11 @@ static void switch_options(int arg, options_t* options) {
             exit(EXIT_SUCCESS);
             break;
         case 'd':
-            options->debug= atoi(optarg);
+            if (optarg) {
+                options->debug = atoi(optarg);
+            } else {
+                error("Error: -d option requires an argument.");
+            }
             break;
         default:
             help();
@@ -57,7 +70,6 @@ static void get_file_name(int argc, char* argv[], options_t* options) {
     }
 }
 
-
 /*
  * Public function that loops until command line options were parsed
  */
@@ -70,7 +82,8 @@ void options_parser (int argc, char* argv[], options_t* options) {
     static struct option long_options[] =
     {
         {"lexer", no_argument, 0, 'l'},
-        {"pretty-print", no_argument, 0, 'p'},
+        {"allocator", no_argument, 0, 'a'},
+        {"pretty-print", required_argument, 0, 'p'},
         {"table-print", no_argument, 0, 't'},
         {"help", no_argument, 0, 'h'},
         {"debug", required_argument, 0, 'd'}
@@ -79,7 +92,7 @@ void options_parser (int argc, char* argv[], options_t* options) {
     while (true) {
 
         int option_index = 0;
-        arg = getopt_long(argc, argv, "lpthd:", long_options, &option_index);
+        arg = getopt_long(argc, argv, "lap:thd:", long_options, &option_index);
 
         /* End of the options? */
         if (arg == -1) break;

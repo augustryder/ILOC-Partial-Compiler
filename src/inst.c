@@ -19,7 +19,10 @@ void printInst(Inst* val) {
 }
 
 void tPrintInst(Inst* val) {
-  printf("| %-8s | %-8d | %-8d | %-8d |\n", opToString(val->opcode), val->op1.val, val->op2.val, val->op3.val);
+  printf("| %-6d | %-6s ", val->index, opToString(val->opcode));
+  printf("| %-6d | %-6d | %-6d | %-6d | %-6d |", val->op1.val, val->op1.sr, val->op1.vr, val->op1.pr, val->op1.nu);
+  printf("| %-6d | %-6d | %-6d | %-6d | %-6d |", val->op2.val, val->op2.sr, val->op2.vr, val->op2.pr, val->op2.nu);
+  printf("| %-6d | %-6d | %-6d | %-6d | %-6d |\n", val->op3.val, val->op3.sr, val->op3.vr, val->op3.pr, val->op3.nu);
   return;
 }
 
@@ -47,12 +50,13 @@ void prettyPrintInst(Inst* val) {
   return;
 }
 
-Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3) {
+Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3, int index) {
   Inst* val = (Inst*) malloc(sizeof(Inst));
   assertCondition(val != NULL, "Memory error allocating Inst.");
   val->opcode = opcode;
   val->op1 = op1;
   val->op2 = op2;
   val->op3 = op3;
+  val->index = index;
   return val;
 }
