@@ -1,0 +1,14 @@
+~/tools_csci3334/p2/tools/AllocOne ~/tools_csci3334/blocks/opt_tests/test_constant.i "$@" 4 ~/tools_csci3334/p2/sim
+echo "	Worst: 20 ops/26 cycles. Best: 14 ops/16 cycles."
+echo
+
+~/tools_csci3334/p2/tools/AllocOne ~/tools_csci3334/blocks/opt_tests/test_constant.i "$@" 5 ~/tools_csci3334/p2/sim
+echo "	Worst: 16 ops/20 cycles. Best: 13 ops/15 cycles."
+echo
+
+~/tools_csci3334/p2/tools/AllocOne ~/tools_csci3334/blocks/opt_tests/test_respill.i "$@" 4 ~/tools_csci3334/p2/sim
+echo "	Worst: 40 ops/52 cycles. Best: 36 ops/48 cycles."
+echo
+
+~/tools_csci3334/p2/tools/AllocOne ~/tools_csci3334/blocks/opt_tests/test_clean.i "$@" 6 ~/tools_csci3334/p2/sim
+echo "	Worst: 38 ops/42 cycles. Best: 34 ops/38 cycles."

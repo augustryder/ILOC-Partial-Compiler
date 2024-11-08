@@ -1,0 +1,137 @@
+-> '-----'.
+Found file 'blocks/timing//T128k.i'
+Found input spec ''
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 127977'
+--> next expected value is 127977 on loop 0
+
+--> next expected value is 127977 on loop 1
+
+--> next expected value is 127977 on loop 2
+
+--> next expected value is 127977 on loop 3
+
+--> next expected value is 127977 on loop 4
+
+--> next expected value is 127977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T16k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 15977'
+--> next expected value is 15977 on loop 0
+
+--> next expected value is 15977 on loop 1
+
+--> next expected value is 15977 on loop 2
+
+--> next expected value is 15977 on loop 3
+
+--> next expected value is 15977 on loop 4
+
+--> next expected value is 15977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T1k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 977'
+--> next expected value is 977 on loop 0
+
+--> next expected value is 977 on loop 1
+
+--> next expected value is 977 on loop 2
+
+--> next expected value is 977 on loop 3
+
+--> next expected value is 977 on loop 4
+
+--> next expected value is 977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T2k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 1977'
+--> next expected value is 1977 on loop 0
+
+--> next expected value is 1977 on loop 1
+
+--> next expected value is 1977 on loop 2
+
+--> next expected value is 1977 on loop 3
+
+--> next expected value is 1977 on loop 4
+
+--> next expected value is 1977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T32k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 31977'
+--> next expected value is 31977 on loop 0
+
+--> next expected value is 31977 on loop 1
+
+--> next expected value is 31977 on loop 2
+
+--> next expected value is 31977 on loop 3
+
+--> next expected value is 31977 on loop 4
+
+--> next expected value is 31977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T4k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 3977'
+--> next expected value is 3977 on loop 0
+
+--> next expected value is 3977 on loop 1
+
+--> next expected value is 3977 on loop 2
+
+--> next expected value is 3977 on loop 3
+
+--> next expected value is 3977 on loop 4
+
+--> next expected value is 3977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T64k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 63977'
+--> next expected value is 63977 on loop 0
+
+--> next expected value is 63977 on loop 1
+
+--> next expected value is 63977 on loop 2
+
+--> next expected value is 63977 on loop 3
+
+--> next expected value is 63977 on loop 4
+
+--> next expected value is 63977 on loop 5
+
+-> '-----'.
+Found file 'blocks/timing//T8k.i'
+Found input spec ' '
+Found k spec '3, 4, 8, 12, 16, 20'
+Found output spec ' 7977'
+--> next expected value is 7977 on loop 0
+
+--> next expected value is 7977 on loop 1
+
+--> next expected value is 7977 on loop 2
+
+--> next expected value is 7977 on loop 3
+
+--> next expected value is 7977 on loop 4
+
+--> next expected value is 7977 on loop 5
+
+-> '-----'.
