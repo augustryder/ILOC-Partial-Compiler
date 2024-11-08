@@ -140,7 +140,7 @@ void localRegAlloc(Block* block, int k) {
     tables.VRtoSL = (int*) malloc(sizeof(int) * (tables.VRName + 1));
     assertCondition(tables.VRtoSL != NULL, "Memory error allocating VRtoSL table.");
 
-    tables.spillLoc = 372768;
+    tables.spillLoc = 32768;
 
     for (int i = 0; i <= tables.VRName; ++i) {
         tables.VRtoPR[i] = -1;
