@@ -11,6 +11,7 @@ void printTokenStream(FILE* file) {
         printToken(nextToken(file));
         skipCommentsAndWhite(file);
     }
+    printf("\n");
 }
 
 Token nextToken(FILE* file) {

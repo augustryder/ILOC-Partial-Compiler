@@ -12,6 +12,7 @@ extern int debug_level;
 struct options {
     bool lexer;
     bool alloc;
+    int k;
     int prettyPrint;
     bool tablePrint;
     bool help;

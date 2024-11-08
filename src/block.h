@@ -15,7 +15,7 @@ int getMaxRegister(Block* lst);
 bool isEmpty(Block* lst);
 void printBlock(Block* lst);
 void tPrintBlock(Block* lst);
-void prettyPrintBlock(Block* lst);
+void prettyPrintBlock(Block* lst, int printLevel);
 void append(Block* lst, Inst* inst);
 void insert_after(Block* lst, Inst* inst);
 void insert_at(Block* lst, Inst* inst, int idx);

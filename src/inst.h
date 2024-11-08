@@ -19,5 +19,5 @@ typedef struct {
 
 Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3, int index);
 void printInst(Inst* val);
-void tPrintInst(Inst* val); //precede with a // so if you print it it still executes
-void prettyPrintInst(Inst* val); // add a selector for SR,VR,PR
+void tPrintInst(Inst* val);
+void prettyPrintInst(Inst* val, int printLevel); 

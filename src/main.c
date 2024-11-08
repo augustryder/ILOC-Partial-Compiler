@@ -25,17 +25,26 @@ int main(int argc, char* argv[]) {
     Block* block = parse(file);
 
     if (options.lexer) {
+        printf("LEXER OUTPUT\n");
+        printf("------------\n");
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
+        if (options.tablePrint) tPrintBlock(block);
+        if (options.prettyPrint >= 0) prettyPrintBlock(block, options.prettyPrint);
     }
-    else if (options.prettyPrint == 1) prettyPrintBlock(block);
-    else if (options.tablePrint) tPrintBlock(block);
 
     if (options.alloc) {
-        localRegAlloc(block, 3);
+        printf("ALLOCATOR OUTPUT\n");
+        printf("----------------\n");
+        if (options.k >= 3) {
+            localRegAlloc(block, options.k);
+        } else {
+            error("Allocator needs at least 3 registers.");
+        }
+        if (options.prettyPrint >= 0) prettyPrintBlock(block, options.prettyPrint);
+        else prettyPrintBlock(block, 2); // default print PRS
+        if (options.tablePrint) tPrintBlock(block);
     }
-    if (options.prettyPrint == 1) prettyPrintBlock(block);
-    else if (options.tablePrint) tPrintBlock(block);
     
     freeBlock(block);
     fclose(file);

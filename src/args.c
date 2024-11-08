@@ -11,7 +11,8 @@
 static void set_default_options(options_t* options) {
     options->lexer = false;
     options->alloc = false;
-    options->prettyPrint = 0;
+    options->k = 10;
+    options->prettyPrint = -1;
     options->tablePrint = false;
     options->help = false;
     options->debug = 0;
@@ -30,11 +31,18 @@ static void switch_options(int arg, options_t* options) {
         case 'a':
             options->alloc = true;
             break;
+        case 'k':
+            if (optarg) {
+                options->k = atoi(optarg);
+            } else {
+                error("Error: -k option requires an argument. See -h.");
+            }
+            break;
         case 'p':
             if (optarg) {
                 options->prettyPrint = atoi(optarg);
             } else {
-                error("Error: -p option requires an argument.");
+                error("Error: -p option requires an argument. See -h.");
             }
             break;
         case 't':
@@ -49,7 +57,7 @@ static void switch_options(int arg, options_t* options) {
             if (optarg) {
                 options->debug = atoi(optarg);
             } else {
-                error("Error: -d option requires an argument.");
+                error("Error: -d option requires an argument. See -h.");
             }
             break;
         default:
@@ -82,7 +90,8 @@ void options_parser (int argc, char* argv[], options_t* options) {
     static struct option long_options[] =
     {
         {"lexer", no_argument, 0, 'l'},
-        {"allocator", no_argument, 0, 'a'},
+        {"alloc", no_argument, 0, 'a'},
+        {"num-reg", required_argument, 0, 'k'},
         {"pretty-print", required_argument, 0, 'p'},
         {"table-print", no_argument, 0, 't'},
         {"help", no_argument, 0, 'h'},
@@ -92,7 +101,7 @@ void options_parser (int argc, char* argv[], options_t* options) {
     while (true) {
 
         int option_index = 0;
-        arg = getopt_long(argc, argv, "lap:thd:", long_options, &option_index);
+        arg = getopt_long(argc, argv, "lak:p:thd:", long_options, &option_index);
 
         /* End of the options? */
         if (arg == -1) break;

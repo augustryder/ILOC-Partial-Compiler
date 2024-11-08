@@ -73,7 +73,7 @@ void tPrintBlock(Block* lst) {
   printf("\n");
 }
 
-void prettyPrintBlock(Block* lst) {
+void prettyPrintBlock(Block* lst, int printLevel) {
   assertCondition(lst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
     printf("Empty Block");
@@ -81,7 +81,7 @@ void prettyPrintBlock(Block* lst) {
   }
   Block* rover = lst;
   while (rover != NULL) {
-    prettyPrintInst(rover->head);
+    prettyPrintInst(rover->head, printLevel);
     rover = rover->next;
   }
   printf("\n");

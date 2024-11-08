@@ -26,27 +26,54 @@ void tPrintInst(Inst* val) {
   return;
 }
 
-void prettyPrintInst(Inst* val) {
+void prettyPrintInst(Inst* val, int printLevel) {
   printf("%-8s", opToString(val->opcode));
 
-  if (val->op1.val == -1) {
-    printf("\n");
-    return; 
+  int op1, op2, op3;
+  if (printLevel == 1) {
+    op1 = val->op1.vr;
+    op2 = val->op2.vr;
+    op3 = val->op3.vr;
+  } else if (printLevel == 2) {
+    op1 = val->op1.pr;
+    op2 = val->op2.pr;
+    op3 = val->op3.pr;
+  } else {
+    op1 = val->op1.sr;
+    op2 = val->op2.sr;
+    op3 = val->op3.sr;
   }
 
-  if (val->opcode == LOADI || val->opcode == OUTPUT) printf("%-8d", val->op1.val);
-  else printf("r%-7d", val->op1.val);
-
-  if (val->op2.val == -1 || val->opcode == STORE) printf("%-8s", "");
-  else printf(", r%-5d", val->op2.val);
-
-  if (val->op3.val == -1) {
-    if (val->opcode == STORE) printf("=> r%-4d", val->op2.val);
-    printf("\n");
-    return; 
+  switch (val->opcode) {
+    case LOAD:
+      printf("r%-7d", op1);
+      printf("%-8s", "");
+      printf("=> r%-4d", op3);
+      break;
+    case LOADI:
+      printf("%-8d", val->op1.val);
+      printf("%-8s", "");
+      printf("=> r%-4d", op3);
+      break;
+    case STORE:
+      printf("r%-7d", op1);
+      printf("%-8s", "");
+      printf("=> r%-4d", op2);
+      break;
+    case OUTPUT:
+      printf("%-8d", val->op1.val);
+      break;
+    case NOP:
+      break;
+    default:
+      printf("r%-7d", op1);
+      printf(", r%-5d", op2);
+      printf("=> r%-4d", op3);
+      break;
   }
-  else printf("=> r%-4d", val->op3.val);
+
   printf("\n");
+
   return;
 }
 
