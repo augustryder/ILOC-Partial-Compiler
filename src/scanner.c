@@ -126,7 +126,7 @@ Token s2to5(FILE* file) {
     if (c == EOF) {
         error("End of file s2.");
     }
-    if (c == 'o' && getc(file) == 'r' && getc(file) == 'e' && isEndOfWord(getc(file))) {
+    if (c == 'o' && getc(file) == 'r' && getc(file) == 'e' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = STORE;
@@ -141,7 +141,7 @@ Token s6to7(FILE* file) {
     if (c == EOF) {
         error("End of file s6.");
     }
-    if (c == 'b' && isEndOfWord(getc(file))) {
+    if (c == 'b' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = SUB;
@@ -176,7 +176,7 @@ Token s9to12(FILE* file) {
             tok.category = INST;
             tok.value.opcode = LOAD;
             return tok;
-        } else if (c == 'I' && isEndOfWord(getc(file))) {
+        } else if (c == 'I' && isEndOfWord(peek(file))) {
             Token tok;
             tok.category = INST;
             tok.value.opcode = LOADI;
@@ -194,7 +194,7 @@ Token s14to18(FILE* file) {
     if (c == EOF) {
         error("End of file s14.");
     }
-    if (c == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isEndOfWord(getc(file))) {
+    if (c == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = LSHIFT;
@@ -209,7 +209,7 @@ Token s13to18(FILE* file) {
     if (c == EOF) {
         error("End of file s13.");
     }
-    if (c == 's' && getc(file) == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isEndOfWord(getc(file))) {
+    if (c == 's' && getc(file) == 'h' && getc(file) == 'i' && getc(file) == 'f' && getc(file) == 't' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = RSHIFT;
@@ -224,7 +224,7 @@ Token s19to18(FILE* file) {
     if (c == EOF) {
         error("End of file s19.");
     }
-    if (c == 'u' && getc(file) == 'l' && getc(file) == 't' && isEndOfWord(getc(file))) {
+    if (c == 'u' && getc(file) == 'l' && getc(file) == 't' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = MULT;
@@ -239,7 +239,7 @@ Token s22to24(FILE* file) {
     if (c == EOF) {
         error("End of file s22.");
     }
-    if (c == 'd' && getc(file) == 'd' && isEndOfWord(getc(file))) {
+    if (c == 'd' && getc(file) == 'd' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = ADD;
@@ -254,7 +254,7 @@ Token s25to27(FILE* file) {
     if (c == EOF) {
         error("End of file s19.");
     }
-    if (c == 'o' && getc(file) == 'p' && isEndOfWord(getc(file))) {
+    if (c == 'o' && getc(file) == 'p' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = NOP;
@@ -269,7 +269,7 @@ Token s28to33(FILE* file) {
     if (c == EOF) {
         error("End of file s19.");
     }
-    if (c == 'u' && getc(file) == 't' && getc(file) == 'p' && getc(file) == 'u' && getc(file) == 't' && isEndOfWord(getc(file))) {
+    if (c == 'u' && getc(file) == 't' && getc(file) == 'p' && getc(file) == 'u' && getc(file) == 't' && isEndOfWord(peek(file))) {
         Token tok;
         tok.category = INST;
         tok.value.opcode = OUTPUT;
