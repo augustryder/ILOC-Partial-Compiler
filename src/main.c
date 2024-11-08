@@ -25,8 +25,8 @@ int main(int argc, char* argv[]) {
     Block* block = parse(file);
 
     if (options.lexer) {
-        printf("LEXER OUTPUT\n");
-        printf("------------\n");
+        printf("// LEXER OUTPUT\n");
+        printf("// ------------\n");
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
         if (options.tablePrint) tPrintBlock(block);
@@ -34,8 +34,8 @@ int main(int argc, char* argv[]) {
     }
 
     if (options.alloc) {
-        printf("ALLOCATOR OUTPUT\n");
-        printf("----------------\n");
+        printf("// ALLOCATOR OUTPUT\n");
+        printf("// ----------------\n");
         if (options.k >= 3) {
             localRegAlloc(block, options.k);
         } else {
