@@ -80,12 +80,10 @@ static int getPR(Block* prevInst, Stack* freePRs, Tables* tables) {
         // get PR with furthest NU
         int x = 0;
         for (int i = 0; i < k; ++i) {
-            printf("%d ", tables->PRtoNU[i]);
             if (tables->PRtoNU[i] > tables->PRtoNU[x]) {
                 x = i;
             }
         }
-        printf("\n");
 
         // insert spill instructions for x
         // A loadI to put the spill location’s address into the reserved register
