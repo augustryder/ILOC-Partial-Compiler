@@ -158,11 +158,6 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
-        for (int i = k - 1; i >= freePRs.top; --i) {
-            printf("%d ", freePRs.stack[i]);
-        }
-        printf("\n");
-
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
             if (tables.VRtoPR[inst->op1.vr] == -1) {
@@ -216,8 +211,6 @@ void localRegAlloc(Block* block, int k) {
             inst->op2.pr = tables.VRtoPR[inst->op2.vr];
             tables.PRtoVR[inst->op2.pr] = inst->op2.vr;   
         }
-
-        printf("op1: %d, op2: %d\n", inst->op1.pr, inst->op2.pr);
         
         if (inst->op1.vr != -1) {
             if (inst->op1.pr == -1) {
@@ -227,7 +220,6 @@ void localRegAlloc(Block* block, int k) {
             if (inst->op1.nu == inf) {
                 // push tables.VRtoPR[inst->op1.vr] onto FreePRs
                 freePRs.stack[--freePRs.top] = inst->op1.pr;
-                printf("Pushing %d onto freePRs, line %d\n", inst->op1.pr, inst->index);
                 tables.PRtoVR[tables.VRtoPR[inst->op1.vr]] = -1;
                 tables.VRtoPR[inst->op1.vr] = -1;
                 tables.PRtoNU[inst->op1.pr] = inf;
