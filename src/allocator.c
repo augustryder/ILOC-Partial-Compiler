@@ -173,8 +173,8 @@ void localRegAlloc(Block* block, int k) {
                     Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
                     Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
-                    insert_after(prevInst, loadI);
                     insert_after(prevInst, load);
+                    insert_after(prevInst, loadI);
 
                 }
             }
