@@ -73,15 +73,19 @@ int computeLastUse(Block* block, Tables* tables) {
 static int getPR(Block* prevInst, Stack* freePRs, Tables* tables) {
     int k = freePRs->size;
     if (freePRs->top < k) {
-        return freePRs->stack[freePRs->top++];
+        int x = freePRs->stack[freePRs->top++];
+        tables->PRtoNU[x] = -1;
+        return x;
     } else {
         // get PR with furthest NU
         int x = 0;
         for (int i = 0; i < k; ++i) {
+            printf("%d ", tables->PRtoNU[i]);
             if (tables->PRtoNU[i] > tables->PRtoNU[x]) {
                 x = i;
             }
         }
+        printf("\n");
 
         // insert spill instructions for x
         // A loadI to put the spill location’s address into the reserved register
@@ -107,7 +111,6 @@ static int getPR(Block* prevInst, Stack* freePRs, Tables* tables) {
 
         // make sure op1 and op2 don't both choose x 
         tables->PRtoNU[x] = -1;
-
         return x;
     }
 }
@@ -155,10 +158,16 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
+        for (int i = k - 1; i >= freePRs.top; --i) {
+            printf("%d ", freePRs.stack[i]);
+        }
+        printf("\n");
+
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
             if (tables.VRtoPR[inst->op1.vr] == -1) {
                 tables.VRtoPR[inst->op1.vr] = getPR(prevInst, &freePRs, &tables);
+                // printf("LINE %d, OP1 PR: %d\n", inst->index, tables.VRtoPR[inst->op1.vr]);
                 if (tables.VRtoSL[inst->op1.vr] != -1) {
                     // RESTORE op1.vr
                     // A loadI to put the spill location’s address into the reserved register
@@ -207,11 +216,18 @@ void localRegAlloc(Block* block, int k) {
             inst->op2.pr = tables.VRtoPR[inst->op2.vr];
             tables.PRtoVR[inst->op2.pr] = inst->op2.vr;   
         }
+
+        printf("op1: %d, op2: %d\n", inst->op1.pr, inst->op2.pr);
         
-        if (inst->op1.pr != -1) {
+        if (inst->op1.vr != -1) {
+            if (inst->op1.pr == -1) {
+                printf("Failed to assign PR to OP1 line %d, VRtoPR %d, PRtoVR", inst->index, tables.VRtoPR[inst->op1.vr]);
+                error("Error.");
+            }
             if (inst->op1.nu == inf) {
                 // push tables.VRtoPR[inst->op1.vr] onto FreePRs
-                freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op1.vr];
+                freePRs.stack[--freePRs.top] = inst->op1.pr;
+                printf("Pushing %d onto freePRs, line %d\n", inst->op1.pr, inst->index);
                 tables.PRtoVR[tables.VRtoPR[inst->op1.vr]] = -1;
                 tables.VRtoPR[inst->op1.vr] = -1;
                 tables.PRtoNU[inst->op1.pr] = inf;
@@ -220,13 +236,21 @@ void localRegAlloc(Block* block, int k) {
             }
         }
 
-        if (inst->op2.pr != -1) {
+        if (inst->op2.vr != -1) {
+            if (inst->op2.pr == -1) {
+                printf("Failed to assign PR to OP2 line %d", inst->index);
+                error("Error.");
+            }
             if (inst->op2.nu == inf) {
                 // push tables.VRtoPR[inst->op1.vr] onto FreePRs
-                freePRs.stack[--freePRs.top] = tables.VRtoPR[inst->op2.vr];
+                freePRs.stack[--freePRs.top] = inst->op2.pr;
                 tables.PRtoVR[tables.VRtoPR[inst->op2.vr]] = -1;
                 tables.VRtoPR[inst->op2.vr] = -1;
                 tables.PRtoNU[inst->op2.pr] = inf;
+                // freePRs.stack[--freePRs.top] = inst->op1.pr;
+                // tables.VRtoPR[inst->op1.vr] = -1;
+                // tables.PRtoVR[inst->op1.pr] = -1;
+                // tables.PRtoNU[inst->op1.pr] = inf;
             } else {
                  tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
             }
@@ -236,7 +260,18 @@ void localRegAlloc(Block* block, int k) {
             tables.VRtoPR[inst->op3.vr] = getPR(prevInst, &freePRs, &tables);
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;   
-            tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
+            if (inst->op3.nu == inf) {
+                freePRs.stack[--freePRs.top] = inst->op3.pr;
+                tables.PRtoVR[tables.VRtoPR[inst->op3.vr]] = -1;
+                tables.VRtoPR[inst->op3.vr] = -1;
+                tables.PRtoNU[inst->op3.pr] = inf;
+                // freePRs.stack[--freePRs.top] = inst->op3.pr;
+                // tables.VRtoPR[inst->op3.vr] = -1;
+                // tables.PRtoVR[inst->op3.pr] = -1;
+                // tables.PRtoNU[inst->op3.pr] = inf;
+            } else {
+                tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
+            }
         }
         
         prevInst = rover;
