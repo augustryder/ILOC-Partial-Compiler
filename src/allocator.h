@@ -21,11 +21,13 @@ typedef struct {
     int* stack;
 } Stack;
 
-// Computes last use, returns MAXLIVE
+// Annotates VRs, NUs, and returns MAXLIVE
 int computeLastUse(Block* block, Tables* tables);
-// locally allocates registers
+
+// Bottom-up local register allocation
 void localRegAlloc(Block* block, int k);
 
+// Frees allocated tables
 void freeTables(Tables* tables);
 
 
