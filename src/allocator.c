@@ -168,7 +168,7 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
-        // printTables(&tables, k, tables.VRName);
+        printTables(&tables, &freePRs, k, tables.VRName);
 
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
@@ -312,7 +312,7 @@ void localRegAlloc(Block* block, int k) {
     freeTables(&tables);
 }
 
-void printTables(Tables* tables, int k, int maxVR) {
+void printTables(Tables* tables, Stack* freePRs, int k, int maxVR) {
 
     int flag = 1;
     printf("PRtoVR: ");
@@ -343,6 +343,12 @@ void printTables(Tables* tables, int k, int maxVR) {
     printf("\n");
     if (flag == 0) {
         printf("PRtoVR and VRtoPR inconsistent!\n");
+    }
+    printf("\n");
+
+    printf("FreePRs: ");
+    for (int i = 0; i < k; ++i) {
+        printf("%d ", freePRs->stack[i]);
     }
     printf("\n");
 }

@@ -26,7 +26,7 @@ int computeLastUse(Block* block, Tables* tables);
 // Bottom-up local register allocation
 void localRegAlloc(Block* block, int k);
 // Prints tables
-void printTables(Tables* tables, int k, int maxVR);
+void printTables(Tables* tables, Stack* freePRs, int k, int maxVR);
 // Frees allocated tables
 void freeTables(Tables* tables);
 
