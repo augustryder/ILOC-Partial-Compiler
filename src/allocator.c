@@ -77,6 +77,7 @@ int computeLastUse(Block* block, Tables* tables) {
 // Helper function for localRegAlloc
 static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     Block* prevInst = *prevInstp;
+    Block* next = prevInst->next;
     int k = freePRs->size;
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
@@ -108,7 +109,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         insert_after(prevInst, store);
         insert_after(prevInst, loadI);
 
-        prevInstp = &(prevInst->next->next);
+        *prevInstp = prevInst->next->next;
 
         // Update tables and memory location for x's spill
         tables->VRtoPR[tables->PRtoVR[x]] = -1;
@@ -174,6 +175,14 @@ void localRegAlloc(Block* block, int k) {
             if (tables.VRtoPR[inst->op1.vr] == -1) {
                 // gets a PR
                 tables.VRtoPR[inst->op1.vr] = getPR(&prevInst, &freePRs, &tables);
+
+                if (prevInst->next != rover) {
+                    printf("Oh no: %u\n", prevInst);
+                    printf("After getPR\n");
+                    tPrintInst(prevInst->head);
+                }
+
+
                 // checks if VR has been spilt, if so then restores
                 if (tables.VRtoSL[inst->op1.vr] != -1) {
                     // RESTORE OP1.VR
@@ -206,6 +215,11 @@ void localRegAlloc(Block* block, int k) {
             if (tables.VRtoPR[inst->op2.vr] == -1) {
                 // gets a PR
                 tables.VRtoPR[inst->op2.vr] = getPR(&prevInst, &freePRs, &tables);
+                if (prevInst->next != rover) {
+                    printf("Oh no: %u\n", prevInst);
+                    printf("After getPR\n");
+                    tPrintInst(prevInst->head);
+                }
                 // checks if VR has been spilt, if so then restores
                 if (tables.VRtoSL[inst->op2.vr] != -1) {
                     // RESTORE OP2.VR
@@ -271,6 +285,11 @@ void localRegAlloc(Block* block, int k) {
         if (inst->op3.vr != -1) {
             // gets a PR and updates
             tables.VRtoPR[inst->op3.vr] = getPR(&prevInst, &freePRs, &tables);
+            if (prevInst && prevInst->next != rover) {
+                printf("Oh no: %u\n", prevInst);
+                printf("After getPR\n");
+                tPrintInst(prevInst->head);
+            }
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;   
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
