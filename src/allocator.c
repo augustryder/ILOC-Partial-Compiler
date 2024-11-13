@@ -183,7 +183,7 @@ void localRegAlloc(Block* block, int k) {
 
                     Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
                     Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
+                    Operand op6 = {.val = -1, .sr = -1, .vr = inst->op1.vr, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
                     Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
                     insert_after(prevInst, load);
@@ -213,7 +213,7 @@ void localRegAlloc(Block* block, int k) {
 
                     Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
                     Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = tables.VRtoPR[inst->op2.vr], .nu = -1};
+                    Operand op6 = {.val = -1, .sr = -1, .vr =  inst->op2.vr, .pr = tables.VRtoPR[inst->op2.vr], .nu = -1};
                     Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
                     insert_after(prevInst, load);
