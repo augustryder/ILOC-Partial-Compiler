@@ -156,13 +156,15 @@ void localRegAlloc(Block* block, int k) {
     }
     for (int i = 0; i < k; ++i) {
         tables.PRtoVR[i] = -1;
-        tables.PRtoNU[i] = -1;
+        tables.PRtoNU[i] = inf;
     }
 
     // Local Register Allocation
     Block* prevInst = NULL;
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
+
+        printTables(&tables, k, tables.VRName);
 
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
@@ -186,6 +188,8 @@ void localRegAlloc(Block* block, int k) {
 
                     insert_after(prevInst, load);
                     insert_after(prevInst, loadI);
+
+                    tables.VRtoSL[inst->op1.vr] = -1;
                 }
             }
             inst->op1.pr = tables.VRtoPR[inst->op1.vr];    
@@ -214,6 +218,8 @@ void localRegAlloc(Block* block, int k) {
 
                     insert_after(prevInst, load);
                     insert_after(prevInst, loadI);
+
+                    tables.VRtoSL[inst->op1.vr] = -1;
                 }
             }
             inst->op2.pr = tables.VRtoPR[inst->op2.vr];
@@ -256,7 +262,7 @@ void localRegAlloc(Block* block, int k) {
 
         // Assigns OP3.PR
         if (inst->op3.vr != -1) {
-            // gets a PR
+            // gets a PR and updates
             tables.VRtoPR[inst->op3.vr] = getPR(prevInst, &freePRs, &tables);
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;   
@@ -274,10 +280,45 @@ void localRegAlloc(Block* block, int k) {
 
         prevInst = rover;
     }
-    
+
     // Free tables and freePRs
     free(freePRs.stack);
     freeTables(&tables);
+}
+
+void printTables(Tables* tables, int k, int maxVR) {
+
+    int flag = 1;
+    printf("PRtoVR: ");
+    for (int i = 0; i < k; ++i) {
+        printf("%d ", tables->PRtoVR[i]);
+        if (tables->PRtoVR[i] != -1) {
+            if (tables->VRtoPR[tables->PRtoVR[i]] != i) {
+                flag = 0;
+            }
+        }
+    }
+    printf("\n");
+    if (flag == 0) {
+        printf("PRtoVR and VRtoPR inconsistent!\n");
+    }
+    printf("\n");
+
+    flag = 1;
+    printf("VRtoPR: ");
+    for (int i = 0; i <= maxVR; ++i) {
+        printf("%d ", tables->VRtoPR[i]);
+        if (tables->VRtoPR[i] != -1) {
+            if (tables->PRtoVR[tables->VRtoPR[i]] != i) {
+                flag = 0;
+            }
+        }
+    }
+    printf("\n");
+    if (flag == 0) {
+        printf("PRtoVR and VRtoPR inconsistent!\n");
+    }
+    printf("\n");
 }
 
 void freeTables(Tables* tables) {
