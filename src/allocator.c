@@ -81,8 +81,14 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     int k = freePRs->size;
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
-        int x = freePRs->stack[freePRs->top++];
+        int x = freePRs->stack[freePRs->top];
         // make sure OP2 doesn't choose x if stack is empty
+        if (x < 0) {
+            printTables(tables, freePRs, k, tables->VRName);
+            printf("FreePRs top: %d\n", freePRs->top);
+            printf("Index: %d\n", (*prevInstp)->head->index);
+        }
+        freePRs->top++;
         tables->PRtoNU[x] = -1;
         return x;
     } else {
@@ -168,7 +174,7 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
-        printTables(&tables, &freePRs, k, tables.VRName);
+        //printTables(&tables, &freePRs, k, tables.VRName);
 
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
@@ -291,11 +297,11 @@ void localRegAlloc(Block* block, int k) {
                 tPrintInst(prevInst->head);
             }
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
-            tables.PRtoVR[inst->op3.pr] = inst->op3.vr;   
+            tables.PRtoVR[inst->op3.pr] = inst->op3.vr;
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
             if (inst->op3.nu == inf) {
                 // push OP3.PR  onto FreePRs
-                freePRs.stack[--freePRs.top] = inst->op1.pr;
+                freePRs.stack[--freePRs.top] = inst->op3.pr;
                 tables.VRtoPR[inst->op3.vr] = -1;
                 tables.PRtoVR[inst->op3.pr] = -1;
                 tables.PRtoNU[inst->op3.pr] = inf;
@@ -346,11 +352,14 @@ void printTables(Tables* tables, Stack* freePRs, int k, int maxVR) {
     }
     printf("\n");
 
+
     printf("FreePRs: ");
-    for (int i = 0; i < k; ++i) {
+    printf("Top: %d ", freePRs->top);
+    for (int i = freePRs->top; i < k; ++i) {
         printf("%d ", freePRs->stack[i]);
     }
     printf("\n");
+
 }
 
 void freeTables(Tables* tables) {
