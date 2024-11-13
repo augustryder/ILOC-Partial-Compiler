@@ -164,7 +164,7 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
-        printTables(&tables, k, tables.VRName);
+        // printTables(&tables, k, tables.VRName);
 
         // Assign OP1.PR
         if (inst->op1.vr != -1) {
