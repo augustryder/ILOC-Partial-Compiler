@@ -87,7 +87,7 @@ bool readNumber(FILE* input, int* out){
   while(true) {
     char c = getc(input);
     if(!isNumber(c)){
-      ungetc(c,input);
+      ungetc(c, input);
       break;
     } else {
       retval = retval * 10 + (c - '0');

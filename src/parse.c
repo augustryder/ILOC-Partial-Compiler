@@ -63,7 +63,7 @@ Inst* getLoad(FILE* file, int index) {
 
     skipBlankspace(file);
     char end = getc(file);
-    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid load syntax!");
+    if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid load syntax!");
     ungetc(end, file);
 
     Operand op1 = {.val = -1, 
@@ -100,7 +100,7 @@ Inst* getLoadI(FILE* file, int index) {
 
     skipBlankspace(file);
     char end = getc(file);
-    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid loadI syntax!");
+    if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid loadI syntax!");
     ungetc(end, file);
 
     Operand op1 = {.val = cnst.value.number, 
@@ -136,7 +136,7 @@ Inst* getStore(FILE* file, int index) {
 
     skipBlankspace(file);
     char end = getc(file);
-    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid store syntax!");
+    if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid store syntax!");
     ungetc(end, file);
 
     Operand op1 = {.val = -1, 
@@ -178,7 +178,7 @@ Inst* getArith(Opcode opcode, FILE* file, int index) {
 
     skipBlankspace(file);
     char end = getc(file);
-    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid arithmetic syntax!");
+    if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid arithmetic syntax!");
     ungetc(end, file);
 
     Operand op1 = {.val = -1, 
@@ -206,9 +206,11 @@ Inst* getOutput(FILE* file, int index) {
     Token cnst = nextToken(file);
     if (cnst.category != CONST) error("Invalid output syntax!");
     
+    printf("%c, %d\n", peek(file), index);
     skipBlankspace(file);
     char end = getc(file);
-    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid output syntax!");
+    printf("%c, %d\n", end, index);
+    if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid output syntax!");
     ungetc(end, file);
 
     Operand op1 = {.val = cnst.value.number, 
@@ -235,7 +237,7 @@ Inst* getOutput(FILE* file, int index) {
 Inst* getNop(FILE* file, int index) {
     skipBlankspace(file);
     char end = getc(file);
-    if (end != '\n' && (end != '/' && peek(file) != '/')) error("Invalid nop syntax!");
+    if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid nop syntax!");
     ungetc(end, file);
 
     Operand op1 = {.val = -1, 
