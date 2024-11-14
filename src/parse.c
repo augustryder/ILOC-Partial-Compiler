@@ -206,10 +206,8 @@ Inst* getOutput(FILE* file, int index) {
     Token cnst = nextToken(file);
     if (cnst.category != CONST) error("Invalid output syntax!");
     
-    printf("%c, %d\n", peek(file), index);
     skipBlankspace(file);
     char end = getc(file);
-    printf("%c, %d\n", end, index);
     if (!isEndOfWord(end) && (end != '/' && peek(file) != '/')) error("Invalid output syntax!");
     ungetc(end, file);
 
