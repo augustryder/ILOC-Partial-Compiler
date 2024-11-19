@@ -288,7 +288,7 @@ void localRegAlloc(Block* block, int k) {
                 Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = inst->op3.pr, .nu = -1};
                 Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
-                insert_after(inst, loadI);
+                insert_after(rover, loadI);
 
             } else {
                 tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
