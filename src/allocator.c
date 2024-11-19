@@ -275,12 +275,21 @@ void localRegAlloc(Block* block, int k) {
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
-            if (inst->op3.nu == 3*inf) {
+            if (inst->op3.nu == inf) {
                 // push OP3.PR  onto FreePRs
                 freePRs.stack[--freePRs.top] = inst->op3.pr;
                 tables.VRtoPR[inst->op3.vr] = -1;
                 tables.PRtoVR[inst->op3.pr] = -1;
                 tables.PRtoNU[inst->op3.pr] = inf;
+
+                // Reset PR to hold 0 
+                Operand op1 = {.val = 0, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = inst->op3.pr, .nu = -1};
+                Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
+
+                insert_after(inst, loadI);
+
             } else {
                 tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
             }
