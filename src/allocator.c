@@ -77,18 +77,11 @@ int computeLastUse(Block* block, Tables* tables) {
 // Helper function for localRegAlloc
 static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     Block* prevInst = *prevInstp;
-    Block* next = prevInst->next;
     int k = freePRs->size;
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
-        int x = freePRs->stack[freePRs->top];
+        int x = freePRs->stack[freePRs->top++];
         // make sure OP2 doesn't choose x if stack is empty
-        if (x < 0) {
-            printTables(tables, freePRs, k, tables->VRName);
-            printf("FreePRs top: %d\n", freePRs->top);
-            printf("Index: %d\n", (*prevInstp)->head->index);
-        }
-        freePRs->top++;
         tables->PRtoNU[x] = -1;
         return x;
     } else {
@@ -114,7 +107,8 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
 
         insert_after(prevInst, store);
         insert_after(prevInst, loadI);
-
+ 
+        // Updates prevInst
         *prevInstp = prevInst->next->next;
 
         // Update tables and memory location for x's spill
@@ -181,14 +175,6 @@ void localRegAlloc(Block* block, int k) {
             if (tables.VRtoPR[inst->op1.vr] == -1) {
                 // gets a PR
                 tables.VRtoPR[inst->op1.vr] = getPR(&prevInst, &freePRs, &tables);
-
-                if (prevInst->next != rover) {
-                    printf("Oh no: %u\n", prevInst);
-                    printf("After getPR\n");
-                    tPrintInst(prevInst->head);
-                }
-
-
                 // checks if VR has been spilt, if so then restores
                 if (tables.VRtoSL[inst->op1.vr] != -1) {
                     // RESTORE OP1.VR
@@ -221,11 +207,6 @@ void localRegAlloc(Block* block, int k) {
             if (tables.VRtoPR[inst->op2.vr] == -1) {
                 // gets a PR
                 tables.VRtoPR[inst->op2.vr] = getPR(&prevInst, &freePRs, &tables);
-                if (prevInst->next != rover) {
-                    printf("Oh no: %u\n", prevInst);
-                    printf("After getPR\n");
-                    tPrintInst(prevInst->head);
-                }
                 // checks if VR has been spilt, if so then restores
                 if (tables.VRtoSL[inst->op2.vr] != -1) {
                     // RESTORE OP2.VR
@@ -291,15 +272,10 @@ void localRegAlloc(Block* block, int k) {
         if (inst->op3.vr != -1) {
             // gets a PR and updates
             tables.VRtoPR[inst->op3.vr] = getPR(&prevInst, &freePRs, &tables);
-            if (prevInst && prevInst->next != rover) {
-                printf("Oh no: %u\n", prevInst);
-                printf("After getPR\n");
-                tPrintInst(prevInst->head);
-            }
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
-            if (inst->op3.nu == inf) {
+            if (inst->op3.nu == 3*inf) {
                 // push OP3.PR  onto FreePRs
                 freePRs.stack[--freePRs.top] = inst->op3.pr;
                 tables.VRtoPR[inst->op3.vr] = -1;
@@ -351,7 +327,6 @@ void printTables(Tables* tables, Stack* freePRs, int k, int maxVR) {
         printf("PRtoVR and VRtoPR inconsistent!\n");
     }
     printf("\n");
-
 
     printf("FreePRs: ");
     printf("Top: %d ", freePRs->top);
