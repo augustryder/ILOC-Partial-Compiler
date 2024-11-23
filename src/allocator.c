@@ -35,7 +35,7 @@ int computeLastUse(Block* block, Tables* tables) {
         tables->SRtoLU[i] = inf;
     }
 
-    // lazy way to get reversed list
+    // Gets reversed list
     Block* reversed = emptyBlock();
     Block* rover = block;
     for (int i = 0; i < numLines; ++i) {
@@ -67,8 +67,8 @@ int computeLastUse(Block* block, Tables* tables) {
     // Check if there is a use without a definition
     for (int i = 0; i <= maxSR; ++i) {
         if (tables->SRtoVR[i] != -1) {
-            printf("Use without a definition, SR: %d\n", i);
-            error("Undefined Behavior.");
+            printf("SR: %d\n", i);
+            error("Use without a definition, undefined behavior.");
         }
     } 
 
@@ -96,9 +96,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         // get PR with furthest NU
         int x = 0;
         for (int i = 0; i < k; ++i) {
-            if (tables->PRtoNU[i] > tables->PRtoNU[x]) {
-                x = i;
-            }
+            if (tables->PRtoNU[i] > tables->PRtoNU[x]) x = i;
         }
         // insert spill instructions for x
         // A loadI to put the spill location’s address into the reserved register
@@ -115,10 +113,9 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
 
         insert_after(prevInst, store);
         insert_after(prevInst, loadI);
- 
+
         // Updates prevInst
         *prevInstp = prevInst->next->next;
-
         // Update tables and memory location for x's spill
         tables->VRtoPR[tables->PRtoVR[x]] = -1;
         tables->VRtoSL[tables->PRtoVR[x]] = tables->spillLoc;
@@ -176,104 +173,61 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
-        //printTables(&tables, &freePRs, k, tables.VRName);
+        // Assigns OP1.PR and OP2.PR
+        Operand* op = &(inst->op1);
+        for (int i = 0; i < 2; ++i) {
+            if (op->vr != -1) {
+                if (tables.VRtoPR[op->vr] == -1) {
+                    // gets a PR
+                    tables.VRtoPR[op->vr] = getPR(&prevInst, &freePRs, &tables);
+                    // checks if VR has been spilt, if so then restores
+                    if (tables.VRtoSL[op->vr] != -1) {
+                        // RESTORE OP1.VR
+                        // A loadI to put the spill location’s address into the reserved register
+                        // A load to retrieve the spilled value from its spill location into its new PR
+                        Operand op1 = {.val = tables.VRtoSL[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                        Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                        Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                        Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
-        // Assign OP1.PR
-        if (inst->op1.vr != -1) {
-            if (tables.VRtoPR[inst->op1.vr] == -1) {
-                // gets a PR
-                tables.VRtoPR[inst->op1.vr] = getPR(&prevInst, &freePRs, &tables);
-                // checks if VR has been spilt, if so then restores
-                if (tables.VRtoSL[inst->op1.vr] != -1) {
-                    // RESTORE OP1.VR
-                    // A loadI to put the spill location’s address into the reserved register
-                    // A load to retrieve the spilled value from its spill location into its new PR
-                    Operand op1 = {.val = tables.VRtoSL[inst->op1.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
+                        Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                        Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                        Operand op6 = {.val = -1, .sr = -1, .vr = op->vr, .pr = tables.VRtoPR[op->vr], .nu = -1};
+                        Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
-                    Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op6 = {.val = -1, .sr = -1, .vr = inst->op1.vr, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
-                    Inst* load = makeInst(LOAD, op4, op5, op6, -2);
+                        insert_after(prevInst, load);
+                        insert_after(prevInst, loadI);
 
-                    insert_after(prevInst, load);
-                    insert_after(prevInst, loadI);
+                        prevInst = prevInst->next->next;
 
-                    prevInst = prevInst->next->next;
-
-                    tables.VRtoSL[inst->op1.vr] = -1;
+                        tables.VRtoSL[op->vr] = -1;
+                    }
                 }
+                op->pr = tables.VRtoPR[op->vr];    
+                tables.PRtoVR[op->pr] = op->vr;    
             }
-            inst->op1.pr = tables.VRtoPR[inst->op1.vr];    
-            tables.PRtoVR[inst->op1.pr] = inst->op1.vr;    
-        }
-
-        // Assign OP2.PR
-        if (inst->op2.vr != -1) {
-            if (tables.VRtoPR[inst->op2.vr] == -1) {
-                // gets a PR
-                tables.VRtoPR[inst->op2.vr] = getPR(&prevInst, &freePRs, &tables);
-                // checks if VR has been spilt, if so then restores
-                if (tables.VRtoSL[inst->op2.vr] != -1) {
-                    // RESTORE OP2.VR
-                    // A loadI to put the spill location’s address into the reserved register
-                    // A load to retrieve the spilled value from its spill location into its new PR
-                    Operand op1 = {.val = tables.VRtoSL[inst->op2.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                    Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op6 = {.val = -1, .sr = -1, .vr =  inst->op2.vr, .pr = tables.VRtoPR[inst->op2.vr], .nu = -1};
-                    Inst* load = makeInst(LOAD, op4, op5, op6, -2);
-
-                    insert_after(prevInst, load);
-                    insert_after(prevInst, loadI);
-
-                    prevInst = prevInst->next->next;
-
-                    tables.VRtoSL[inst->op1.vr] = -1;
-                }
-            }
-            inst->op2.pr = tables.VRtoPR[inst->op2.vr];
-            tables.PRtoVR[inst->op2.pr] = inst->op2.vr;   
+            op = &(inst->op2);
         }
         
-        // Frees OP1.PR if NU = inf, otherwise updates PRs NU
-        if (inst->op1.vr != -1) {
-            if (inst->op1.pr == -1) {
-                printf("Failed to assign PR to OP1 line %d", inst->index);
-                error("");
+        // Frees OP1.PR and or OP2.PR if NU = inf, otherwise updates respective PRs NU
+        op = &(inst->op1);
+        for (int i = 0; i < 2; ++i) {
+            if (op->vr != -1) {
+                if (op->pr == -1) {
+                    printf("Failed to assign PR to OP%d line %d", i+1, inst->index);
+                    error("");
+                }
+                if (op->nu == inf) {
+                    // push OP.PR onto freePRs
+                    freePRs.stack[--freePRs.top] = op->pr;
+                    tables.VRtoPR[op->vr] = -1;
+                    tables.PRtoVR[op->pr] = -1;
+                    tables.PRtoNU[op->pr] = inf;
+                } else {
+                    tables.PRtoNU[op->pr] = op->nu;
+                }
             }
-            if (inst->op1.nu == inf) {
-                // push OP1.PR onto freePRs
-                freePRs.stack[--freePRs.top] = inst->op1.pr;
-                tables.VRtoPR[inst->op1.vr] = -1;
-                tables.PRtoVR[inst->op1.pr] = -1;
-                tables.PRtoNU[inst->op1.pr] = inf;
-            } else {
-                tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
-            }
-        }
-
-        // Frees OP2.PR if NU = inf, otherwise updates PRs NU
-        if (inst->op2.vr != -1) {
-            if (inst->op2.pr == -1) {
-                printf("Failed to assign PR to OP2 line %d", inst->index);
-                error("");
-            }
-            if (inst->op2.nu == inf) {
-                // push OP2.PR onto freePRs
-                freePRs.stack[--freePRs.top] = inst->op2.pr;
-                tables.VRtoPR[inst->op2.vr] = -1;
-                tables.PRtoVR[inst->op2.pr] = -1;
-                tables.PRtoNU[inst->op2.pr] = inf;
-            } else {
-                 tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
-            }
+            op = &(inst->op2);
         }
 
         // Assigns OP3.PR
@@ -284,20 +238,11 @@ void localRegAlloc(Block* block, int k) {
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
             if (inst->op3.nu == inf) {
-                // push OP3.PR  onto FreePRs
+                // push OP3.PR onto FreePRs
                 freePRs.stack[--freePRs.top] = inst->op3.pr;
                 tables.VRtoPR[inst->op3.vr] = -1;
                 tables.PRtoVR[inst->op3.pr] = -1;
                 tables.PRtoNU[inst->op3.pr] = inf;
-
-                // Reset PR to hold 0 
-                Operand op1 = {.val = 0, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = inst->op3.pr, .nu = -1};
-                Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                insert_after(rover, loadI);
-
             } else {
                 tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
             }
