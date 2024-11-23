@@ -64,6 +64,14 @@ int computeLastUse(Block* block, Tables* tables) {
         iter = iter->next;
     }
 
+    // Check if there is a use without a definition
+    for (int i = 0; i <= maxSR; ++i) {
+        if (tables->SRtoVR[i] != -1) {
+            printf("Use without a definition, SR: %d\n", i);
+            error("Undefined Behavior.");
+        }
+    } 
+
     // free reversed list
     while (reversed != NULL) {
         Block* nextNode = reversed->next;  // Save the next node
@@ -246,15 +254,6 @@ void localRegAlloc(Block* block, int k) {
                 tables.VRtoPR[inst->op1.vr] = -1;
                 tables.PRtoVR[inst->op1.pr] = -1;
                 tables.PRtoNU[inst->op1.pr] = inf;
-
-                // Reset PR to hold 0 
-                Operand op1 = {.val = 0, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = inst->op1.pr, .nu = -1};
-                Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                insert_after(rover, loadI);
-
             } else {
                 tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
             }
@@ -272,15 +271,6 @@ void localRegAlloc(Block* block, int k) {
                 tables.VRtoPR[inst->op2.vr] = -1;
                 tables.PRtoVR[inst->op2.pr] = -1;
                 tables.PRtoNU[inst->op2.pr] = inf;
-
-                // Reset PR to hold 0 
-                Operand op1 = {.val = 0, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = inst->op2.pr, .nu = -1};
-                Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                insert_after(rover, loadI);
-
             } else {
                  tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
             }
