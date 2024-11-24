@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 // Helper function for computeLastUse
-static void update(Operand* op, int index, Tables* tables) {
+static void update(Operand* op, Tables* tables) {
     if (tables->SRtoVR[op->sr] == -1) {
         tables->SRtoVR[op->sr] = tables->VRName++;
         tables->live++;
@@ -50,13 +50,13 @@ int computeLastUse(Block* block, Tables* tables) {
     for (int i = numLines - 1; i >= 0; --i) {
         Inst* inst = iter->head;
         if (inst->op3.sr != -1) {
-            update(&inst->op3, i, tables);
+            update(&inst->op3, tables);
             if (tables->SRtoVR[inst->op3.sr] != -1) tables->live--;
             tables->SRtoVR[inst->op3.sr] = -1;
             tables->SRtoLU[inst->op3.sr] = inf;
         }
-        if (inst->op1.sr != -1) update(&inst->op1, i, tables);
-        if (inst->op2.sr != -1) update(&inst->op2, i, tables);
+        if (inst->op1.sr != -1) update(&inst->op1, tables);
+        if (inst->op2.sr != -1) update(&inst->op2, tables);
         if (inst->op1.sr != -1) tables->SRtoLU[inst->op1.sr] = i;
         if (inst->op2.sr != -1) tables->SRtoLU[inst->op2.sr] = i;
         iter = iter->next;
