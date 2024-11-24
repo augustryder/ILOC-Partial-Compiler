@@ -4,14 +4,13 @@
 #include <stdlib.h>
 
 // Helper function for computeLastUse
-static void update(Operand* OP, int index, Tables* tables) {
-    if (tables->SRtoVR[OP->sr] == -1) {
-        tables->SRtoVR[OP->sr] = tables->VRName++;
+static void update(Operand* op, Tables* tables) {
+    if (tables->SRtoVR[op->sr] == -1) {
+        tables->SRtoVR[op->sr] = tables->VRName++;
         tables->live++;
     }
-    OP->vr = tables->SRtoVR[OP->sr];
-    OP->nu = tables->SRtoLU[OP->sr];
-    tables->SRtoLU[OP->sr] = index;
+    op->vr = tables->SRtoVR[op->sr];
+    op->nu = tables->SRtoLU[op->sr];
 }
 
 // Annotates NUs, VRs, and returns MAXLIVE
@@ -19,17 +18,18 @@ int computeLastUse(Block* block, Tables* tables) {
     int numLines = size(block);
     int maxSR = getMaxRegister(block);
     int inf = numLines * 2;
+    int MAXLIVE = 0;
 
     // Initialize tables
+    tables->live = 0;
+    tables->VRName = 0;
+
     tables->SRtoVR = (int*) malloc(sizeof(int) * (maxSR + 1));
     assertCondition(tables->SRtoVR != NULL, "Memory error allocating SRtoVR table.");
 
     tables->SRtoLU = (int*) malloc(sizeof(int) * (maxSR + 1));
     assertCondition(tables->SRtoLU != NULL, "Memory error allocating SRtoLU table.");
-    
-    tables->live = 0;
-    tables->MAXLIVE = 0;
-    tables->VRName = 0;
+
     for (int i = 0; i <= maxSR; ++i) {
         tables->SRtoVR[i] = -1;
         tables->SRtoLU[i] = inf;
@@ -47,30 +47,25 @@ int computeLastUse(Block* block, Tables* tables) {
     for (int i = numLines - 1; i >= 0; --i) {
         Inst* inst = iter->head;
         if (inst->op3.sr != -1) {
-            update(&inst->op3, i, tables);
+            update(&inst->op3, tables);
+            if (tables->live > MAXLIVE) {
+                MAXLIVE = tables->live;
+            }
             if (tables->SRtoVR[inst->op3.sr] != -1) tables->live--;
             tables->SRtoVR[inst->op3.sr] = -1;
             tables->SRtoLU[inst->op3.sr] = inf;
         }
-        if (inst->op1.sr != -1) {
-            update(&inst->op1, i, tables);
-        }
-        if (inst->op2.sr != -1) {
-            update(&inst->op2, i, tables);
-        }
-        if (tables->live > tables->MAXLIVE) {
-            tables->MAXLIVE = tables->live;
-        }
+        if (inst->op1.sr != -1) update(&inst->op1, tables);
+        if (inst->op2.sr != -1) update(&inst->op2, tables);
+        if (inst->op1.sr != -1) tables->SRtoLU[inst->op1.sr] = i;
+        if (inst->op2.sr != -1) tables->SRtoLU[inst->op2.sr] = i;
         iter = iter->next;
     }
 
     // Check if there is a use without a definition
-    for (int i = 0; i <= maxSR; ++i) {
-        if (tables->SRtoVR[i] != -1) {
-            printf("SR: %d\n", i);
-            error("Use without a definition, undefined behavior.");
-        }
-    } 
+    if (tables->live > 0) {
+        error("Use without a definition, undefined behavior.");
+    }
 
     // free reversed list
     while (reversed != NULL) {
@@ -79,7 +74,7 @@ int computeLastUse(Block* block, Tables* tables) {
         reversed = nextNode;        // Move to the next node
     }
 
-    return tables->MAXLIVE;
+    return MAXLIVE;
 }
 
 // Helper function for localRegAlloc
@@ -233,7 +228,9 @@ void localRegAlloc(Block* block, int k) {
         // Assigns OP3.PR
         if (inst->op3.vr != -1) {
             // gets a PR and updates
-            tables.VRtoPR[inst->op3.vr] = getPR(&prevInst, &freePRs, &tables);
+            if (tables.VRtoPR[inst->op3.vr] == -1) {
+                tables.VRtoPR[inst->op3.vr] = getPR(&prevInst, &freePRs, &tables);
+            }
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
