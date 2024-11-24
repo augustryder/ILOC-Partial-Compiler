@@ -14,7 +14,6 @@ static void update(Operand* op, int index, Tables* tables) {
     }
     op->vr = tables->SRtoVR[op->sr];
     op->nu = tables->SRtoLU[op->sr];
-    tables->SRtoLU[op->sr] = index;
 }
 
 // Annotates NUs, VRs, and returns MAXLIVE
@@ -58,6 +57,8 @@ int computeLastUse(Block* block, Tables* tables) {
         }
         if (inst->op1.sr != -1) update(&inst->op1, i, tables);
         if (inst->op2.sr != -1) update(&inst->op2, i, tables);
+        if (inst->op1.sr != -1) tables->SRtoLU[inst->op1.sr] = i;
+        if (inst->op2.sr != -1) tables->SRtoLU[inst->op2.sr] = i;
         iter = iter->next;
     }
 
@@ -68,9 +69,9 @@ int computeLastUse(Block* block, Tables* tables) {
 
     // free reversed list
     while (reversed != NULL) {
-        Block* nextNode = reversed->next;  // Save the next node
-        free(reversed);             // Free the current Block node
-        reversed = nextNode;        // Move to the next node
+        Block* nextNode = reversed->next;
+        free(reversed);
+        reversed = nextNode;
     }
 
     return tables->MAXLIVE;
