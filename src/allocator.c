@@ -68,9 +68,9 @@ int computeLastUse(Block* block, Tables* tables) {
 
     // free reversed list
     while (reversed != NULL) {
-        Block* nextNode = reversed->next;  // Save the next node
-        free(reversed);             // Free the current Block node
-        reversed = nextNode;        // Move to the next node
+        Block* nextNode = reversed->next;
+        free(reversed);
+        reversed = nextNode;
     }
 
     return tables->MAXLIVE;
