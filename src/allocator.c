@@ -130,7 +130,6 @@ void localRegAlloc(Block* block, int k) {
     Tables tables;
     // Computes MAXLIVE and reserves register if MAXLIVE > # PRS
     int MAXLIVE = computeLastUse(block, &tables);
-    printf("MAXLIVE: %d\n", tables.MAXLIVE);
     if (MAXLIVE > k) k--;
 
     // Initialize freePRs
@@ -167,8 +166,6 @@ void localRegAlloc(Block* block, int k) {
     Block* prevInst = NULL;
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
-
-        printTables(&tables, &freePRs, k, tables.VRName);
 
         // Assigns OP1.PR and OP2.PR
         Operand* op = &(inst->op1);
