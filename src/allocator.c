@@ -4,14 +4,17 @@
 #include <stdlib.h>
 
 // Helper function for computeLastUse
-static void update(Operand* OP, int index, Tables* tables) {
-    if (tables->SRtoVR[OP->sr] == -1) {
-        tables->SRtoVR[OP->sr] = tables->VRName++;
+static void update(Operand* op, int index, Tables* tables) {
+    if (tables->SRtoVR[op->sr] == -1) {
+        tables->SRtoVR[op->sr] = tables->VRName++;
         tables->live++;
+        if (tables->live > tables->MAXLIVE) {
+            tables->MAXLIVE = tables->live;
+        }
     }
-    OP->vr = tables->SRtoVR[OP->sr];
-    OP->nu = tables->SRtoLU[OP->sr];
-    tables->SRtoLU[OP->sr] = index;
+    op->vr = tables->SRtoVR[op->sr];
+    op->nu = tables->SRtoLU[op->sr];
+    tables->SRtoLU[op->sr] = index;
 }
 
 // Annotates NUs, VRs, and returns MAXLIVE
@@ -21,21 +24,22 @@ int computeLastUse(Block* block, Tables* tables) {
     int inf = numLines * 2;
 
     // Initialize tables
+    tables->live = 0;
+    tables->MAXLIVE = 0;
+    tables->VRName = 0;
+
     tables->SRtoVR = (int*) malloc(sizeof(int) * (maxSR + 1));
     assertCondition(tables->SRtoVR != NULL, "Memory error allocating SRtoVR table.");
 
     tables->SRtoLU = (int*) malloc(sizeof(int) * (maxSR + 1));
     assertCondition(tables->SRtoLU != NULL, "Memory error allocating SRtoLU table.");
-    
-    tables->live = 0;
-    tables->MAXLIVE = 0;
-    tables->VRName = 0;
+
     for (int i = 0; i <= maxSR; ++i) {
         tables->SRtoVR[i] = -1;
         tables->SRtoLU[i] = inf;
     }
 
-    // lazy way to get reversed list
+    // Gets reversed list
     Block* reversed = emptyBlock();
     Block* rover = block;
     for (int i = 0; i < numLines; ++i) {
@@ -52,16 +56,14 @@ int computeLastUse(Block* block, Tables* tables) {
             tables->SRtoVR[inst->op3.sr] = -1;
             tables->SRtoLU[inst->op3.sr] = inf;
         }
-        if (inst->op1.sr != -1) {
-            update(&inst->op1, i, tables);
-        }
-        if (inst->op2.sr != -1) {
-            update(&inst->op2, i, tables);
-        }
-        if (tables->live > tables->MAXLIVE) {
-            tables->MAXLIVE = tables->live;
-        }
+        if (inst->op1.sr != -1) update(&inst->op1, i, tables);
+        if (inst->op2.sr != -1) update(&inst->op2, i, tables);
         iter = iter->next;
+    }
+
+    // Check if there is a use without a definition
+    if (tables->live > 0) {
+        error("Use without a definition, undefined behavior.");
     }
 
     // free reversed list
@@ -77,18 +79,11 @@ int computeLastUse(Block* block, Tables* tables) {
 // Helper function for localRegAlloc
 static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     Block* prevInst = *prevInstp;
-    Block* next = prevInst->next;
     int k = freePRs->size;
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
-        int x = freePRs->stack[freePRs->top];
+        int x = freePRs->stack[freePRs->top++];
         // make sure OP2 doesn't choose x if stack is empty
-        if (x < 0) {
-            printTables(tables, freePRs, k, tables->VRName);
-            printf("FreePRs top: %d\n", freePRs->top);
-            printf("Index: %d\n", (*prevInstp)->head->index);
-        }
-        freePRs->top++;
         tables->PRtoNU[x] = -1;
         return x;
     } else {
@@ -115,8 +110,8 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         insert_after(prevInst, store);
         insert_after(prevInst, loadI);
 
+        // Updates prevInst
         *prevInstp = prevInst->next->next;
-
         // Update tables and memory location for x's spill
         tables->VRtoPR[tables->PRtoVR[x]] = -1;
         tables->VRtoSL[tables->PRtoVR[x]] = tables->spillLoc;
@@ -174,133 +169,74 @@ void localRegAlloc(Block* block, int k) {
     for (Block* rover = block; rover != NULL; rover = rover->next) {
         Inst* inst = rover->head;
 
-        //printTables(&tables, &freePRs, k, tables.VRName);
+        // Assigns OP1.PR and OP2.PR
+        Operand* op = &(inst->op1);
+        for (int i = 0; i < 2; ++i) {
+            if (op->vr != -1) {
+                if (tables.VRtoPR[op->vr] == -1) {
+                    // gets a PR
+                    tables.VRtoPR[op->vr] = getPR(&prevInst, &freePRs, &tables);
+                    // checks if VR has been spilt, if so then restores
+                    if (tables.VRtoSL[op->vr] != -1) {
+                        // RESTORE OP1.VR
+                        // A loadI to put the spill location’s address into the reserved register
+                        // A load to retrieve the spilled value from its spill location into its new PR
+                        Operand op1 = {.val = tables.VRtoSL[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                        Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                        Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                        Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
-        // Assign OP1.PR
-        if (inst->op1.vr != -1) {
-            if (tables.VRtoPR[inst->op1.vr] == -1) {
-                // gets a PR
-                tables.VRtoPR[inst->op1.vr] = getPR(&prevInst, &freePRs, &tables);
+                        Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                        Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                        Operand op6 = {.val = -1, .sr = -1, .vr = op->vr, .pr = tables.VRtoPR[op->vr], .nu = -1};
+                        Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
-                if (prevInst->next != rover) {
-                    printf("Oh no: %u\n", prevInst);
-                    printf("After getPR\n");
-                    tPrintInst(prevInst->head);
+                        insert_after(prevInst, load);
+                        insert_after(prevInst, loadI);
+
+                        prevInst = prevInst->next->next;
+
+                        tables.VRtoSL[op->vr] = -1;
+                    }
                 }
-
-
-                // checks if VR has been spilt, if so then restores
-                if (tables.VRtoSL[inst->op1.vr] != -1) {
-                    // RESTORE OP1.VR
-                    // A loadI to put the spill location’s address into the reserved register
-                    // A load to retrieve the spilled value from its spill location into its new PR
-                    Operand op1 = {.val = tables.VRtoSL[inst->op1.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                    Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op6 = {.val = -1, .sr = -1, .vr = inst->op1.vr, .pr = tables.VRtoPR[inst->op1.vr], .nu = -1};
-                    Inst* load = makeInst(LOAD, op4, op5, op6, -2);
-
-                    insert_after(prevInst, load);
-                    insert_after(prevInst, loadI);
-
-                    prevInst = prevInst->next->next;
-
-                    tables.VRtoSL[inst->op1.vr] = -1;
-                }
+                op->pr = tables.VRtoPR[op->vr];    
+                tables.PRtoVR[op->pr] = op->vr;    
             }
-            inst->op1.pr = tables.VRtoPR[inst->op1.vr];    
-            tables.PRtoVR[inst->op1.pr] = inst->op1.vr;    
-        }
-
-        // Assign OP2.PR
-        if (inst->op2.vr != -1) {
-            if (tables.VRtoPR[inst->op2.vr] == -1) {
-                // gets a PR
-                tables.VRtoPR[inst->op2.vr] = getPR(&prevInst, &freePRs, &tables);
-                if (prevInst->next != rover) {
-                    printf("Oh no: %u\n", prevInst);
-                    printf("After getPR\n");
-                    tPrintInst(prevInst->head);
-                }
-                // checks if VR has been spilt, if so then restores
-                if (tables.VRtoSL[inst->op2.vr] != -1) {
-                    // RESTORE OP2.VR
-                    // A loadI to put the spill location’s address into the reserved register
-                    // A load to retrieve the spilled value from its spill location into its new PR
-                    Operand op1 = {.val = tables.VRtoSL[inst->op2.vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                    Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
-                    Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                    Operand op6 = {.val = -1, .sr = -1, .vr =  inst->op2.vr, .pr = tables.VRtoPR[inst->op2.vr], .nu = -1};
-                    Inst* load = makeInst(LOAD, op4, op5, op6, -2);
-
-                    insert_after(prevInst, load);
-                    insert_after(prevInst, loadI);
-
-                    prevInst = prevInst->next->next;
-
-                    tables.VRtoSL[inst->op1.vr] = -1;
-                }
-            }
-            inst->op2.pr = tables.VRtoPR[inst->op2.vr];
-            tables.PRtoVR[inst->op2.pr] = inst->op2.vr;   
-        }
+            op = &(inst->op2);
+        }  
         
-        // Frees OP1.PR if NU = inf, otherwise updates PRs NU
-        if (inst->op1.vr != -1) {
-            if (inst->op1.pr == -1) {
-                printf("Failed to assign PR to OP1 line %d", inst->index);
-                error("");
+        // Frees OP1.PR and or OP2.PR if NU = inf, otherwise updates respective PRs NU
+        op = &(inst->op1);
+        for (int i = 0; i < 2; ++i) {
+            if (op->vr != -1) {
+                if (op->pr == -1) {
+                    printf("Failed to assign PR to OP%d line %d", i+1, inst->index);
+                    error("");
+                }
+                if (op->nu == inf) {
+                    // push OP.PR onto freePRs
+                    freePRs.stack[--freePRs.top] = op->pr;
+                    tables.VRtoPR[op->vr] = -1;
+                    tables.PRtoVR[op->pr] = -1;
+                    tables.PRtoNU[op->pr] = inf;
+                } else {
+                    tables.PRtoNU[op->pr] = op->nu;
+                }
             }
-            if (inst->op1.nu == inf) {
-                // push OP1.PR onto freePRs
-                freePRs.stack[--freePRs.top] = inst->op1.pr;
-                tables.VRtoPR[inst->op1.vr] = -1;
-                tables.PRtoVR[inst->op1.pr] = -1;
-                tables.PRtoNU[inst->op1.pr] = inf;
-            } else {
-                tables.PRtoNU[inst->op1.pr] = inst->op1.nu;
-            }
-        }
-
-        // Frees OP2.PR if NU = inf, otherwise updates PRs NU
-        if (inst->op2.vr != -1) {
-            if (inst->op2.pr == -1) {
-                printf("Failed to assign PR to OP2 line %d", inst->index);
-                error("");
-            }
-            if (inst->op2.nu == inf) {
-                // push OP2.PR onto freePRs
-                freePRs.stack[--freePRs.top] = inst->op2.pr;
-                tables.VRtoPR[inst->op2.vr] = -1;
-                tables.PRtoVR[inst->op2.pr] = -1;
-                tables.PRtoNU[inst->op2.pr] = inf;
-            } else {
-                 tables.PRtoNU[inst->op2.pr] = inst->op2.nu;
-            }
+            op = &(inst->op2);
         }
 
         // Assigns OP3.PR
         if (inst->op3.vr != -1) {
             // gets a PR and updates
-            tables.VRtoPR[inst->op3.vr] = getPR(&prevInst, &freePRs, &tables);
-            if (prevInst && prevInst->next != rover) {
-                printf("Oh no: %u\n", prevInst);
-                printf("After getPR\n");
-                tPrintInst(prevInst->head);
+            if (tables.VRtoPR[inst->op3.vr] == -1) {
+                tables.VRtoPR[inst->op3.vr] = getPR(&prevInst, &freePRs, &tables);
             }
             inst->op3.pr = tables.VRtoPR[inst->op3.vr];
             tables.PRtoVR[inst->op3.pr] = inst->op3.vr;
             // Frees OP3.PR if NU = inf, otherwise updates PRs NU
             if (inst->op3.nu == inf) {
-                // push OP3.PR  onto FreePRs
+                // push OP3.PR onto FreePRs
                 freePRs.stack[--freePRs.top] = inst->op3.pr;
                 tables.VRtoPR[inst->op3.vr] = -1;
                 tables.PRtoVR[inst->op3.pr] = -1;
@@ -351,7 +287,6 @@ void printTables(Tables* tables, Stack* freePRs, int k, int maxVR) {
         printf("PRtoVR and VRtoPR inconsistent!\n");
     }
     printf("\n");
-
 
     printf("FreePRs: ");
     printf("Top: %d ", freePRs->top);
