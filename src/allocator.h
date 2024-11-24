@@ -11,7 +11,9 @@ typedef struct {
     int* VRtoPR;
     int* PRtoVR;
     int* PRtoNU;
-    int* VRtoSL;
+    int* VRtoSL; // VR to it's spill location
+    int* VRtoRM; // VR to it's rematerializable value
+    int* isVRSpilled; // isVRSpilled[vr0] == 1 if vr0 is currently spilled, 0 otheriwse
     int spillLoc;
 } Tables;
 
