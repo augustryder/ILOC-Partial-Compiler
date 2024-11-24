@@ -289,15 +289,6 @@ void localRegAlloc(Block* block, int k) {
                 tables.VRtoPR[inst->op3.vr] = -1;
                 tables.PRtoVR[inst->op3.pr] = -1;
                 tables.PRtoNU[inst->op3.pr] = inf;
-
-                // Reset PR to hold 0 
-                Operand op1 = {.val = 0, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
-                Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = inst->op3.pr, .nu = -1};
-                Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
-
-                insert_after(rover, loadI);
-
             } else {
                 tables.PRtoNU[inst->op3.pr] = inst->op3.nu;
             }
