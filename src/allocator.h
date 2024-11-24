@@ -4,6 +4,7 @@
 
 typedef struct {
     int live;
+    int MAXLIVE;
     int VRName;
     int* SRtoVR;
     int* SRtoLU;
