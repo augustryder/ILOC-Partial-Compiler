@@ -6,7 +6,6 @@ typedef struct {
     int live;
     int MAXLIVE;
     int VRName;
-    int lastStore;
     int* SRtoVR;
     int* SRtoLU;
     int* VRtoPR;
