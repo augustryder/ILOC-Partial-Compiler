@@ -102,8 +102,8 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         }
         int vr = tables->PRtoVR[x];
 
-        // If VR is not rematerializable and hasn't been spilt before, insert spill instructions
-        if (tables->VRtoRM[vr] == -1 && tables->VRtoSL[vr] == -1) {
+        // If VR is not rematerializable then insert spill instructions
+        if (tables->VRtoRM[vr] == -1) {
             // A loadI to put the spill location’s address into the reserved register
             // A store to move the spilled value from its PR into its spill location
             Operand op1 = {.val = tables->spillLoc, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
