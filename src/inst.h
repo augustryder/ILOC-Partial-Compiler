@@ -2,12 +2,11 @@
 #include "types.h"
 
 typedef struct {
-    int val; // constant
-    int sr; // source register
-    int vr; // virtual register
-    int pr; // physical register
-    int nu; // index of vrs next use
-    int ns; // index of next store inst
+    int val;
+    int sr;
+    int vr;
+    int pr;
+    int nu;
 } Operand;
 
 typedef struct {

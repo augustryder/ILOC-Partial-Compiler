@@ -14,7 +14,6 @@ static void update(Operand* op, int index, Tables* tables) {
     }
     op->vr = tables->SRtoVR[op->sr];
     op->nu = tables->SRtoLU[op->sr];
-    // op->ns = tables->lastStore;
     tables->SRtoLU[op->sr] = index;
 }
 
@@ -28,7 +27,6 @@ int computeLastUse(Block* block, Tables* tables) {
     tables->live = 0;
     tables->MAXLIVE = 0;
     tables->VRName = 0;
-    // tables->lastStore = inf;
 
     tables->SRtoVR = (int*) malloc(sizeof(int) * (maxSR + 1));
     assertCondition(tables->SRtoVR != NULL, "Memory error allocating SRtoVR table.");
@@ -61,9 +59,6 @@ int computeLastUse(Block* block, Tables* tables) {
         }
         if (inst->op1.sr != -1) update(&inst->op1, i, tables);
         if (inst->op2.sr != -1) update(&inst->op2, i, tables);
-        // if (inst->opcode == STORE) {
-        //     tables->lastStore = i;
-        // }
         iter = iter->next;
     }
 
@@ -102,18 +97,18 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         }
         int vr = tables->PRtoVR[x];
 
-        // If VR is not rematerializable then insert spill instructions
-        if (tables->VRtoRM[vr] == -1) {
+        // If VR is not rematerializable and hasn't been spilt before, insert spill instructions
+        if (tables->VRtoRM[vr] == -1 && tables->VRtoSL[vr] == -1) {
             // A loadI to put the spill location’s address into the reserved register
             // A store to move the spilled value from its PR into its spill location
-            Operand op1 = {.val = tables->spillLoc, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-            Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-            Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
+            Operand op1 = {.val = tables->spillLoc, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+            Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+            Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
             Inst* loadI = makeInst(LOADI, op1, op2, op3, -1);
 
-            Operand op4 = {.val = -1, .sr = -1, .vr = vr, .pr = x, .nu = -1, .ns = -1};
-            Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
-            Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
+            Operand op4 = {.val = -1, .sr = -1, .vr = vr, .pr = x, .nu = -1};
+            Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+            Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
             Inst* store = makeInst(STORE, op4, op5, op6, -1);
 
             insert_after(prevInst, store);
@@ -207,9 +202,9 @@ void localRegAlloc(Block* block, int k) {
                         // If VR is rematerializable then rematerialize, otherwise restore from memory
                         if (tables.VRtoRM[op->vr] != -1) {
                             // A loadI to rematerialize the VRs value into its new PR
-                            Operand op1 = {.val = tables.VRtoRM[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-                            Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-                            Operand op3 = {.val = -1, .sr = -1, .vr = op->vr, .pr = tables.VRtoPR[op->vr], .nu = -1, .ns = -1};
+                            Operand op1 = {.val = tables.VRtoRM[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                            Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                            Operand op3 = {.val = -1, .sr = -1, .vr = op->vr, .pr = tables.VRtoPR[op->vr], .nu = -1};
                             Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
                             insert_after(prevInst, loadI);
@@ -218,14 +213,14 @@ void localRegAlloc(Block* block, int k) {
                         } else {
                             // A loadI to put the put location’s address into the reserved register
                             // A load to retrieve the spilled value from its spill location into its new PR
-                            Operand op1 = {.val = tables.VRtoSL[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-                            Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-                            Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
+                            Operand op1 = {.val = tables.VRtoSL[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                            Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                            Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
                             Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
 
-                            Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
-                            Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
-                            Operand op6 = {.val = -1, .sr = -1, .vr = op->vr, .pr = tables.VRtoPR[op->vr], .nu = -1, .ns = -1};
+                            Operand op4 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1};
+                            Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1};
+                            Operand op6 = {.val = -1, .sr = -1, .vr = op->vr, .pr = tables.VRtoPR[op->vr], .nu = -1};
                             Inst* load = makeInst(LOAD, op4, op5, op6, -2);
 
                             insert_after(prevInst, load);
