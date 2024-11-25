@@ -4,7 +4,6 @@
 #include "utils.h"
 #include "scanner.h"
 
-
 Block* parse(FILE* file) {
     Block* IR = emptyBlock();
     int index = 0;
@@ -70,19 +69,22 @@ Inst* getLoad(FILE* file, int index) {
                    .sr = r1.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op2 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op3 = {.val = -1, 
                    .sr = r2.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
 
     return makeInst(LOAD, op1, op2, op3, index);
@@ -107,19 +109,22 @@ Inst* getLoadI(FILE* file, int index) {
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op2 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op3 = {.val = -1, 
                    .sr = r2.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     return makeInst(LOADI, op1, op2, op3, index);
 }
@@ -143,19 +148,22 @@ Inst* getStore(FILE* file, int index) {
                    .sr = r1.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op2 = {.val = -1, 
                    .sr = r2.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op3 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     return makeInst(STORE, op1, op2, op3, index);
 }
@@ -185,19 +193,22 @@ Inst* getArith(Opcode opcode, FILE* file, int index) {
                    .sr = r1.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op2 = {.val = -1, 
                    .sr = r2.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op3 = {.val = -1, 
                    .sr = r3.value.number, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     return makeInst(opcode, op1, op2, op3, index);
 }
@@ -215,19 +226,22 @@ Inst* getOutput(FILE* file, int index) {
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op2 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op3 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     return makeInst(OUTPUT, op1, op2, op3, index);
 }
@@ -242,20 +256,22 @@ Inst* getNop(FILE* file, int index) {
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op2 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     Operand op3 = {.val = -1, 
                    .sr = -1, 
                    .vr = -1, 
                    .pr = -1, 
-                   .nu = -1};
+                   .nu = -1,
+                   .ns = -1};
 
     return makeInst(NOP, op1, op2, op3, index);
 }
-

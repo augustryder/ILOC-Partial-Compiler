@@ -5,7 +5,7 @@
 #include "types.h"
 
 void printOperand(Operand op) {
-  printf("(%d, %d, %d, %d, %d) ", op.val, op.sr, op.vr, op.pr, op.nu);
+  printf("(%d, %d, %d, %d, %d, %d) ", op.val, op.sr, op.vr, op.pr, op.nu, op.ns);
   return;
 }
 
@@ -20,9 +20,9 @@ void printInst(Inst* val) {
 
 void tPrintInst(Inst* val) {
   printf("| %-6d | %-6s ", val->index, opToString(val->opcode));
-  printf("| %-6d | %-6d | %-6d | %-6d | %-6d |", val->op1.val, val->op1.sr, val->op1.vr, val->op1.pr, val->op1.nu);
-  printf("| %-6d | %-6d | %-6d | %-6d | %-6d |", val->op2.val, val->op2.sr, val->op2.vr, val->op2.pr, val->op2.nu);
-  printf("| %-6d | %-6d | %-6d | %-6d | %-6d |\n", val->op3.val, val->op3.sr, val->op3.vr, val->op3.pr, val->op3.nu);
+  printf("| %-6d | %-6d | %-6d | %-6d | %-6d | %-6d |", val->op1.val, val->op1.sr, val->op1.vr, val->op1.pr, val->op1.nu, val->op1.ns);
+  printf("| %-6d | %-6d | %-6d | %-6d | %-6d | %-6d |", val->op2.val, val->op2.sr, val->op2.vr, val->op2.pr, val->op2.nu, val->op2.ns);
+  printf("| %-6d | %-6d | %-6d | %-6d | %-6d | %-6d |\n", val->op3.val, val->op3.sr, val->op3.vr, val->op3.pr, val->op3.nu, val->op3.ns);
   return;
 }
 

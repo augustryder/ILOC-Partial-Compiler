@@ -1,6 +1,6 @@
 //NAME: Jake Kornblau
 //NETID: jak6
-//SIM INPUT: -r 1147483648
+//SIM INPUT:
 //OUTPUT: 1 8 28 56 70 56 28 8 1
 
 // Calculates the first 9 rows of pascal's triangles

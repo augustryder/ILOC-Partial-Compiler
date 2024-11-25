@@ -6,6 +6,7 @@ typedef struct {
     int live;
     int MAXLIVE;
     int VRName;
+    int lastStore;
     int* SRtoVR;
     int* SRtoLU;
     int* VRtoPR;
@@ -13,6 +14,7 @@ typedef struct {
     int* PRtoNU;
     int* VRtoSL; // VR to it's spill location
     int* VRtoRM; // VR to it's rematerializable value
+    int* VRtoCL; // VR to it's memory address if clean
     int* isVRSpilled; // isVRSpilled[vr0] == 1 if vr0 is currently spilled, 0 otheriwse
     int spillLoc;
 } Tables;
