@@ -7,6 +7,7 @@ typedef struct {
     int vr; // virtual register
     int pr; // physical register
     int nu; // index of vrs next use
+    int ns; // index of next store
 } Operand;
 
 typedef struct {

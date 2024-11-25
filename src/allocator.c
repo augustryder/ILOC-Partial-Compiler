@@ -14,6 +14,7 @@ static void update(Operand* op, int index, Tables* tables) {
     }
     op->vr = tables->SRtoVR[op->sr];
     op->nu = tables->SRtoLU[op->sr];
+    op->ns = tables->lastStore;
     tables->SRtoLU[op->sr] = index;
 }
 
@@ -27,6 +28,7 @@ int computeLastUse(Block* block, Tables* tables) {
     tables->live = 0;
     tables->MAXLIVE = 0;
     tables->VRName = 0;
+    tables->lastStore = inf;
 
     tables->SRtoVR = (int*) malloc(sizeof(int) * (maxSR + 1));
     assertCondition(tables->SRtoVR != NULL, "Memory error allocating SRtoVR table.");
@@ -59,6 +61,9 @@ int computeLastUse(Block* block, Tables* tables) {
         }
         if (inst->op1.sr != -1) update(&inst->op1, i, tables);
         if (inst->op2.sr != -1) update(&inst->op2, i, tables);
+        if (inst->opcode == STORE) {
+            tables->lastStore = i;
+        }
         iter = iter->next;
     }
 
