@@ -88,21 +88,35 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     int k = freePRs->size;
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
-        int x = freePRs->stack[freePRs->top++];
+        int pr = freePRs->stack[freePRs->top++];
         // make sure OP2 doesn't choose x if stack is empty
-        tables->PRtoNU[x] = -1;
-        return x;
+        tables->PRtoNU[pr] = -1;
+        return pr;
     } else {
-        // get PR with furthest NU
-        int x = 0;
+        // get furthest NU for all, clean, and rematerializable PRs
+        int pr;
+        int vr;
+        int maxNU = 0;
+        int maxClean = -1;
+        int maxRemat = -1;
         for (int i = 0; i < k; ++i) {
-            if (tables->PRtoNU[i] > tables->PRtoNU[x]) {
-                x = i;
+            vr = tables->PRtoVR[i];
+            if (tables->PRtoNU[i] > tables->PRtoNU[maxNU]) {
+                maxNU = i;
+            }
+            if (tables->VRtoML[vr] != -1 && tables->PRtoNU[i] > maxClean) {
+                maxClean = i;
+            }
+            if (tables->VRtoRM[vr] != -1 && tables->PRtoNU[i] > maxRemat) {
+                maxRemat = i;
             }
         }
-        int vr = tables->PRtoVR[x];
 
-        // If VR is not rematerializable and hasn't been spilt before and isn't clean, insert spill instructions
+        // Heuristic for deciding spill, currently: maxNU
+        pr = maxNU;
+        vr = tables->PRtoVR[pr];
+
+        // If VR is not rematerializable also isn't clean, insert spill instructions
         if (tables->VRtoRM[vr] == -1 && tables->VRtoML[vr] == -1) {
             // A loadI to put the spill location’s address into the reserved register
             // A store to move the spilled value from its PR into its spill location
@@ -111,7 +125,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
             Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
             Inst* loadI = makeInst(LOADI, op1, op2, op3, -1);
 
-            Operand op4 = {.val = -1, .sr = -1, .vr = vr, .pr = x, .nu = -1, .ns = -1};
+            Operand op4 = {.val = -1, .sr = -1, .vr = vr, .pr = pr, .nu = -1, .ns = -1};
             Operand op5 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
             Operand op6 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
             Inst* store = makeInst(STORE, op4, op5, op6, -1);
@@ -129,11 +143,11 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         // Kills VR to PR relation
         tables->isVRSpilled[vr] = 1;
         tables->VRtoPR[vr] = -1;
-        tables->PRtoVR[x] = -1;
+        tables->PRtoVR[pr] = -1;
         // make sure OP1 and OP2 don't both choose x 
-        tables->PRtoNU[x] = -1;
+        tables->PRtoNU[pr] = -1;
 
-        return x;
+        return pr;
     }
 }
 
