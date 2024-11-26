@@ -85,6 +85,7 @@ int computeLastUse(Block* block, Tables* tables) {
 // Helper function for localRegAlloc
 static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     Block* prevInst = *prevInstp;
+    int index = prevInst->head->index + 1;
     int k = freePRs->size;
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
@@ -100,20 +101,29 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         int maxClean = -1;
         int maxRemat = -1;
         for (int i = 0; i < k; ++i) {
-            vr = tables->PRtoVR[i];
-            if (tables->PRtoNU[i] > tables->PRtoNU[maxNU]) {
-                maxNU = i;
-            }
-            if (tables->VRtoML[vr] != -1 && tables->PRtoNU[i] > maxClean) {
-                maxClean = i;
-            }
-            if (tables->VRtoRM[vr] != -1 && tables->PRtoNU[i] > maxRemat) {
-                maxRemat = i;
+            if (tables->PRtoNU[i] > index) {
+                vr = tables->PRtoVR[i];
+                if (tables->PRtoNU[i] > tables->PRtoNU[maxNU]) {
+                    maxNU = i;
+                }
+                if (tables->VRtoML[vr] != -1) {
+                    if (maxClean == -1 || tables->PRtoNU[i] > tables->PRtoNU[maxClean]) {
+                        maxClean = i;
+                    }
+                } else if (tables->VRtoRM[vr] != -1) {
+                    if (maxRemat == -1 || tables->PRtoNU[i] > tables->PRtoNU[maxRemat]) {
+                        maxRemat = i;
+                    }
+                }
             }
         }
 
-        // Heuristic for deciding spill, currently: maxNU
-        pr = maxNU;
+        // Heuristic for deciding spill
+        int distToMaxNU = tables->PRtoNU[maxNU] - index;
+        if (maxRemat >= 0 && tables->PRtoNU[maxRemat] > index + .40 * distToMaxNU) pr = maxRemat;
+        else if (maxClean >= 0 && tables->PRtoNU[maxClean] > index + .70 * distToMaxNU) pr = maxClean;
+        else pr = maxNU;
+
         vr = tables->PRtoVR[pr];
 
         // If VR is not rematerializable also isn't clean, insert spill instructions
