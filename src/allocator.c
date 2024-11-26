@@ -103,7 +103,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         int vr = tables->PRtoVR[x];
 
         // If VR is not rematerializable and hasn't been spilt before and isn't clean, insert spill instructions
-        if (tables->VRtoRM[vr] == -1 && tables->VRtoSL[vr] == -1 && tables->VRtoCL[vr] == -1) {
+        if (tables->VRtoRM[vr] == -1 && tables->VRtoML[vr] == -1) {
             // A loadI to put the spill location’s address into the reserved register
             // A store to move the spilled value from its PR into its spill location
             Operand op1 = {.val = tables->spillLoc, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
@@ -122,7 +122,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
             // Updates prevInst
             *prevInstp = prevInst->next->next;
             // Update table and memory location for x's spill
-            tables->VRtoSL[vr] = tables->spillLoc;
+            tables->VRtoML[vr] = tables->spillLoc;
             tables->spillLoc += 4;
         }
 
@@ -163,14 +163,11 @@ void localRegAlloc(Block* block, int k) {
     tables.PRtoNU = (int*) malloc(sizeof(int) * k);
     assertCondition(tables.PRtoNU != NULL, "Memory error allocating PRtoNU table.");
 
-    tables.VRtoSL = (int*) malloc(sizeof(int) * (tables.VRName + 1));
-    assertCondition(tables.VRtoSL != NULL, "Memory error allocating VRtoSL table.");
+    tables.VRtoML = (int*) malloc(sizeof(int) * (tables.VRName + 1));
+    assertCondition(tables.VRtoML != NULL, "Memory error allocating VRtoML table.");
 
     tables.VRtoRM = (int*) malloc(sizeof(int) * (tables.VRName + 1));
     assertCondition(tables.VRtoRM != NULL, "Memory error allocating VRtoRM table.");
-
-    tables.VRtoCL = (int*) malloc(sizeof(int) * (tables.VRName + 1));
-    assertCondition(tables.VRtoCL != NULL, "Memory error allocating VRtoCL table.");
 
     tables.isVRSpilled = (int*) malloc(sizeof(int) * (tables.VRName + 1));
     assertCondition(tables.isVRSpilled != NULL, "Memory error allocating isVRSpilled table.");
@@ -179,9 +176,8 @@ void localRegAlloc(Block* block, int k) {
 
     for (int i = 0; i <= tables.VRName; ++i) {
         tables.VRtoPR[i] = -1;
-        tables.VRtoSL[i] = -1;
+        tables.VRtoML[i] = -1;
         tables.VRtoRM[i] = -1;
-        tables.VRtoCL[i] = -1;
         tables.isVRSpilled[i] = 0;
     }
     for (int i = 0; i < k; ++i) {
@@ -201,7 +197,7 @@ void localRegAlloc(Block* block, int k) {
 
         // If LOAD and address is remateriablizable and no stores before NU, set OP2.vr to clean
         if (inst->opcode == LOAD && tables.VRtoRM[inst->op1.vr] != -1 && inst->op3.ns >= inst->op3.nu) {
-            tables.VRtoCL[inst->op3.vr] = tables.VRtoRM[inst->op1.vr];
+            tables.VRtoML[inst->op3.vr] = tables.VRtoRM[inst->op1.vr];
         }
 
         // Assigns OP1.PR and OP2.PR
@@ -225,15 +221,9 @@ void localRegAlloc(Block* block, int k) {
                             prevInst = prevInst->next;
 
                         } else {
-                            int address;
-                            if (tables.VRtoCL[op->vr] != -1) {
-                                address = tables.VRtoCL[op->vr];
-                            } else {
-                                address = tables.VRtoSL[op->vr];
-                            }
                             // A loadI to put the put location’s address into the reserved register
                             // A load to retrieve the spilled value from its spill location into its new PR
-                            Operand op1 = {.val = address, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
+                            Operand op1 = {.val = tables.VRtoML[op->vr], .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
                             Operand op2 = {.val = -1, .sr = -1, .vr = -1, .pr = -1, .nu = -1, .ns = -1};
                             Operand op3 = {.val = -1, .sr = -1, .vr = -1, .pr = k, .nu = -1, .ns = -1};
                             Inst* loadI = makeInst(LOADI, op1, op2, op3, -2);
@@ -253,9 +243,9 @@ void localRegAlloc(Block* block, int k) {
                 }
                 op->pr = tables.VRtoPR[op->vr];    
                 tables.PRtoVR[op->pr] = op->vr;
-                // Sets VR to dirty if there is a store before it's NU
-                if (op->ns < op->nu || inst->opcode == STORE) {
-                    tables.VRtoCL[op->vr] = -1;
+                // Sets VR to dirty if it's from user mem and there is a store before it's NU
+                if (tables.VRtoML[op->vr] < 32768 && (op->ns < op->nu || inst->opcode == STORE)) {
+                    tables.VRtoML[op->vr] = -1;
                 }
             }
             op = &(inst->op2);
@@ -358,5 +348,6 @@ void freeTables(Tables* tables) {
     free(tables->VRtoPR);
     free(tables->PRtoVR);
     free(tables->PRtoNU);
-    free(tables->VRtoSL);
+    free(tables->VRtoML);
+    free(tables->VRtoRM);
 }
