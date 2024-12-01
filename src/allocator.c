@@ -71,7 +71,7 @@ int computeLastUse(Block* block, int blockSize, Tables* tables) {
         error("Use without a definition, undefined behavior.");
     }
 
-    // free reversed list
+    // Free reversed list
     while (reversed != NULL) {
         Block* nextNode = reversed->next;
         free(reversed);

@@ -61,9 +61,10 @@ void prettyPrintInst(Inst* val, int printLevel) {
       printf("=> r%-4d", op2);
       break;
     case OUTPUT:
-      printf("%-8d", val->op1.val);
+      printf("%-24d", val->op1.val);
       break;
     case NOP:
+      printf("%-24s", "");
       break;
     default:
       printf("r%-7d", op1);
@@ -72,6 +73,52 @@ void prettyPrintInst(Inst* val, int printLevel) {
       break;
   }
 
+  // Prints source registers as commemts
+  printf(" // ");
+
+  if (val->index == -1) {
+    if (val->opcode == LOADI) {
+      printf("Spill into %d,", val->op1.val);
+    }
+  } else if (val->index == -2) {
+    if (val->opcode == LOADI) {
+      printf("Restore from  %d", val->op1.val);
+    }
+  } else {
+    printf("%-8s", opToString(val->opcode));
+    op1 = val->op1.sr;
+    op2 = val->op2.sr;
+    op3 = val->op3.sr;
+
+    switch (val->opcode) {
+      case LOAD:
+        printf("r%-7d", op1);
+        printf("%-8s", "");
+        printf("=> r%-4d", op3);
+        break;
+      case LOADI:
+        printf("%-8d", val->op1.val);
+        printf("%-8s", "");
+        printf("=> r%-4d", op3);
+        break;
+      case STORE:
+        printf("r%-7d", op1);
+        printf("%-8s", "");
+        printf("=> r%-4d", op2);
+        break;
+      case OUTPUT:
+        printf("%-24d", val->op1.val);
+        break;
+      case NOP:
+        printf("%-24s", "");
+        break;
+      default:
+        printf("r%-7d", op1);
+        printf(", r%-5d", op2);
+        printf("=> r%-4d", op3);
+        break;
+    }
+  }
   printf("\n");
 
   return;

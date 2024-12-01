@@ -22,3 +22,4 @@ Inst* makeInst(Opcode opcode, Operand op1, Operand op2, Operand op3, int index);
 void printInst(Inst* val);
 void tPrintInst(Inst* val);
 void prettyPrintInst(Inst* val, int printLevel); 
+void printOperand(Operand op);
