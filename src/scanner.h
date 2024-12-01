@@ -1,8 +1,17 @@
 #pragma once
 #include <stdio.h>
-#include "token.h"
 #include "utils.h"
+#include "types.h"
 
+typedef struct {
+    Category category;
+    union {
+        Opcode opcode;
+        int number;
+    } value;
+} Token;
+
+void printToken(Token tok);
 void printTokenStream(FILE* file);
 Token nextToken(FILE* file);
 Token s0(FILE* file);

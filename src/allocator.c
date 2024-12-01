@@ -19,10 +19,19 @@ static void update(Operand* op, int index, Tables* tables) {
 }
 
 // Annotates NUs, VRs, and returns MAXLIVE
-int computeLastUse(Block* block, Tables* tables) {
-    int numLines = size(block);
-    int maxSR = getMaxRegister(block);
-    int inf = numLines * 2;
+int computeLastUse(Block* block, int blockSize, Tables* tables) {
+    int inf = blockSize * 2;
+    // Gets reversed list and gets max source register
+    int maxSR = -1;
+    Block* reversed = emptyBlock();
+    Block* rover = block;
+    for (int i = 0; i < blockSize; ++i) {
+        if (rover->head->op1.sr > maxSR) maxSR = rover->head->op1.sr;
+        if (rover->head->op2.sr > maxSR) maxSR = rover->head->op2.sr;
+        if (rover->head->op3.sr > maxSR) maxSR = rover->head->op3.sr;
+        insert_at(reversed, rover->head, 0);
+        rover = rover->next;
+    }
 
     // Initialize tables
     tables->live = 0;
@@ -41,16 +50,8 @@ int computeLastUse(Block* block, Tables* tables) {
         tables->SRtoLU[i] = inf;
     }
 
-    // Gets reversed list
-    Block* reversed = emptyBlock();
-    Block* rover = block;
-    for (int i = 0; i < numLines; ++i) {
-        insert_at(reversed, rover->head, 0);
-        rover = rover->next;
-    }
-
     Block* iter = reversed;
-    for (int i = numLines - 1; i >= 0; --i) {
+    for (int i = blockSize - 1; i >= 0; --i) {
         Inst* inst = iter->head;
         if (inst->op3.sr != -1) {
             update(&inst->op3, i, tables);
@@ -120,8 +121,8 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
 
         // Heuristic for deciding spill
         int distToMaxNU = tables->PRtoNU[maxNU] - index;
-        if (maxRemat >= 0 && tables->PRtoNU[maxRemat] > index + .40 * distToMaxNU) pr = maxRemat;
-        else if (maxClean >= 0 && tables->PRtoNU[maxClean] > index + .70 * distToMaxNU) pr = maxClean;
+        if (maxRemat >= 0 && tables->PRtoNU[maxRemat] > index + .20 * distToMaxNU) pr = maxRemat;
+        else if (maxClean >= 0 && tables->PRtoNU[maxClean] > index + .50 * distToMaxNU) pr = maxClean;
         else pr = maxNU;
 
         vr = tables->PRtoVR[pr];
@@ -161,14 +162,11 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     }
 }
 
-void localRegAlloc(Block* block, int k) {
-
-    int numLines = size(block);
-    int inf = numLines * 2;
-
+void localRegAlloc(Block* block, int blockSize, int k) {
+    int inf = blockSize * 2;
     Tables tables;
     // Computes MAXLIVE and reserves register if MAXLIVE > # PRS
-    int MAXLIVE = computeLastUse(block, &tables);
+    int MAXLIVE = computeLastUse(block, blockSize, &tables);
     if (MAXLIVE > k) k--;
 
     // Initialize freePRs
@@ -367,11 +365,12 @@ void printTables(Tables* tables, Stack* freePRs, int k, int maxVR) {
 }
 
 void freeTables(Tables* tables) {
-    free(tables->SRtoLU);
     free(tables->SRtoVR);
+    free(tables->SRtoLU);
     free(tables->VRtoPR);
     free(tables->PRtoVR);
     free(tables->PRtoNU);
     free(tables->VRtoML);
     free(tables->VRtoRM);
+    free(tables->isVRSpilled);
 }

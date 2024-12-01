@@ -4,8 +4,9 @@
 #include "utils.h"
 #include "scanner.h"
 
-Block* parse(FILE* file) {
-    Block* IR = emptyBlock();
+Block* parse(FILE* file, int* blockSize) {
+    Block* block = emptyBlock();
+    Block* rover = block;
     int index = 0;
     skipCommentsAndWhite(file);
     while (peek(file) != EOF) {
@@ -13,41 +14,44 @@ Block* parse(FILE* file) {
         if (tok.category != INST) error("Invalid instruction syntax!");
         switch (tok.value.opcode) {
             case LOAD:
-                append(IR, getLoad(file, index++));
+                insert_after(rover, getLoad(file, index));
                 break;
             case LOADI:
-                append(IR, getLoadI(file, index++));
+                insert_after(rover, getLoadI(file, index));
                 break;
             case STORE:
-                append(IR, getStore(file, index++));
+                insert_after(rover, getStore(file, index));
                 break;
             case ADD:
-                append(IR, getArith(ADD, file, index++));
+                insert_after(rover, getArith(ADD, file, index));
                 break;
             case SUB:
-                append(IR, getArith(SUB, file, index++));
+                insert_after(rover, getArith(SUB, file, index));
                 break;
             case MULT:
-                append(IR, getArith(MULT, file, index++));
+                insert_after(rover, getArith(MULT, file, index));
                 break;
             case LSHIFT:
-                append(IR, getArith(LSHIFT, file, index++));
+                insert_after(rover, getArith(LSHIFT, file, index));
                 break;
             case RSHIFT:
-                append(IR, getArith(RSHIFT, file, index++));
+                insert_after(rover, getArith(RSHIFT, file, index));
                 break;
             case OUTPUT:
-                append(IR, getOutput(file, index++));
+                insert_after(rover, getOutput(file, index));
                 break;
             case NOP:
-                append(IR, getNop(file, index++));
+                insert_after(rover, getNop(file, index));
                 break;
             default:
                 error("Token contains invalid opcode.");
         }
         skipCommentsAndWhite(file);
+        if (index > 0) rover = rover->next;
+        index++;
     }
-    return IR;
+    *blockSize = index;
+    return block;
 }
 
 Inst* getLoad(FILE* file, int index) {

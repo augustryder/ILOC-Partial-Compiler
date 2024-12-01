@@ -25,9 +25,9 @@ typedef struct {
 } Stack;
 
 // Annotates VRs, NUs, and returns MAXLIVE
-int computeLastUse(Block* block, Tables* tables);
+int computeLastUse(Block* block, int blockSize, Tables* tables);
 // Bottom-up local register allocation
-void localRegAlloc(Block* block, int k);
+void localRegAlloc(Block* block, int blockSize, int k);
 // Prints tables
 void printTables(Tables* tables, Stack* freePRs, int k, int maxVR);
 // Frees allocated tables

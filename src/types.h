@@ -11,7 +11,7 @@ typedef enum {
     LSHIFT, RSHIFT,
     OUTPUT,
     NOP
-} Opcode ;
+} Opcode;
 
 char* catToString(Category cat);
 char* opToString(Opcode op);

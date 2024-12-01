@@ -11,7 +11,6 @@ typedef struct block
 
 Block* emptyBlock(void);
 int size(Block* lst);
-int getMaxRegister(Block* lst);
 bool isEmpty(Block* lst);
 void printBlock(Block* lst);
 void tPrintBlock(Block* lst);

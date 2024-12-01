@@ -21,18 +21,6 @@ int size(Block* lst){
   return size;
 }
 
-int getMaxRegister(Block* block) {
-  int max = -1;
-  Block* rover = block;
-  while (rover != NULL) {
-    if (rover->head->op1.sr > max) max = rover->head->op1.sr;
-    if (rover->head->op2.sr > max) max = rover->head->op2.sr;
-    if (rover->head->op3.sr > max) max = rover->head->op3.sr;
-    rover = rover->next; 
-  }
-  return max;
-}
-
 bool isEmpty(Block* lst){
   assertCondition(lst != NULL, "Null Parameter.");
   return lst->head == NULL;
@@ -106,7 +94,8 @@ void append(Block* lst, Inst* inst) {
 void insert_after(Block* lst, Inst* inst){
   assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
   if (isEmpty(lst)) {
-    error("Uh oh! You cannot insert_after on an empty block!");
+    lst->head = inst;
+    return;
   }
   Block* newNode = emptyBlock();
   newNode->head = inst;
@@ -182,7 +171,6 @@ void remove_at(Block* lst, int idx) {
     remove_next(rover);
   }
 }
-
 
 void freeBlock(Block *lst) {
     assertCondition(lst != NULL, "Null Paramter.");
