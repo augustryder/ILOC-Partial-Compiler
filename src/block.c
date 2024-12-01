@@ -110,9 +110,6 @@ void insert_after(Block* lst, Inst* inst){
 
 void insert_at(Block* lst, Inst* inst, int idx) {
   assertCondition(lst != NULL && inst != NULL, "Null Parameter.");
-  if (idx >= size(lst)) {
-    error("Uh oh! Index out of bounds!");
-  }
   Block* newNode;
   if (idx == 0) {
     if (isEmpty(lst)) {
@@ -128,6 +125,7 @@ void insert_at(Block* lst, Inst* inst, int idx) {
     Block* rover = lst;
     for (int i = 0; i < idx-1; i++){
       rover = rover->next;
+      if (rover == NULL) error("Uh oh! Index out of bounds!");
     }
     insert_after(rover, inst);
   }

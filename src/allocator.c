@@ -24,13 +24,11 @@ int computeLastUse(Block* block, int blockSize, Tables* tables) {
     // Gets reversed list and gets max source register
     int maxSR = -1;
     Block* reversed = emptyBlock();
-    Block* rover = block;
-    for (int i = 0; i < blockSize; ++i) {
+    for (Block* rover = block; rover != NULL; rover = rover->next) {
         if (rover->head->op1.sr > maxSR) maxSR = rover->head->op1.sr;
         if (rover->head->op2.sr > maxSR) maxSR = rover->head->op2.sr;
         if (rover->head->op3.sr > maxSR) maxSR = rover->head->op3.sr;
         insert_at(reversed, rover->head, 0);
-        rover = rover->next;
     }
 
     // Initialize tables
@@ -91,7 +89,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
     // Gets PR from stack if non-empty, else spills PR
     if (freePRs->top < k) {
         int pr = freePRs->stack[freePRs->top++];
-        // make sure OP2 doesn't choose x if stack is empty
+        // make sure OP2 doesn't choose pr if stack is empty
         tables->PRtoNU[pr] = -1;
         return pr;
     } else {
@@ -146,7 +144,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
 
             // Updates prevInst
             *prevInstp = prevInst->next->next;
-            // Update table and memory location for x's spill
+            // Update table and memory location for pr's spill
             tables->VRtoML[vr] = tables->spillLoc;
             tables->spillLoc += 4;
         }
@@ -155,7 +153,7 @@ static int getPR(Block** prevInstp, Stack* freePRs, Tables* tables) {
         tables->isVRSpilled[vr] = 1;
         tables->VRtoPR[vr] = -1;
         tables->PRtoVR[pr] = -1;
-        // make sure OP1 and OP2 don't both choose x 
+        // make sure OP1 and OP2 don't both choose pr
         tables->PRtoNU[pr] = -1;
 
         return pr;
