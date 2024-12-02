@@ -10,10 +10,10 @@
  */
 static void set_default_options(options_t* options) {
     options->lexer = false;
-    options->alloc = true;
+    options->alloc = false;
     options->k = 5;
     options->prettyPrint = -1;
-    options->tablePrint = false;
+    options->tablePrint = true;
     options->help = false;
     options->debug = 0;
 }

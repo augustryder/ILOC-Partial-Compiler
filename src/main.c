@@ -26,11 +26,8 @@ int main(int argc, char* argv[]) {
     Block* block = parse(file, &blockSize);
 
     if (options.lexer) {
-        printf("// LEXER OUTPUT\n");
-        printf("// ------------\n");
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
-        if (options.tablePrint) tPrintBlock(block);
         if (options.prettyPrint >= 0) prettyPrintBlock(block, options.prettyPrint);
     }
 
@@ -41,13 +38,12 @@ int main(int argc, char* argv[]) {
             error("Allocator needs at least 3 registers.");
         }
         if (options.prettyPrint >= 0) {
-            printf("// ALLOCATOR OUTPUT\n");
-            printf("// ----------------\n");
             prettyPrintBlock(block, options.prettyPrint);
         }
         else prettyPrintBlock(block, 2); // Default print physical registers
-        if (options.tablePrint) tPrintBlock(block);
     }
+
+    if (options.tablePrint) tPrintBlock(block);
     
     freeBlock(block);
     fclose(file);
