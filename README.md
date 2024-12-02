@@ -2,7 +2,7 @@
 ## Semester project: thc
 
 * Name(s): August Herron
-* Project Number: 1
+* Project Number: 3
 
 ### Overview
 This repository will contain your code for all project components.
