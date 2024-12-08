@@ -21,7 +21,7 @@ void freeNeighbors(Neighbors* nei) {
 }
 
 Vertex initVertex(int label) {
-    Vertex v = {label, emptyNeighbors()};
+    Vertex v = {label, -1, 0, -1, NULL, emptyNeighbors()};
     return v;
 }
 
@@ -55,12 +55,22 @@ void addEdge(int u, int v, Graph* G) {
         newNei->next = nei;
         G->vertices[u-1].neighbors = newNei;
     }
+    G->vertices[v-1].indegree++;
 }
 
 void printGraph(Graph* G) {
-    printf("Graph:\n");
+
+    printf("nodes:\n");
     for (int i = 0; i < G->size; ++i) {
-        printf("    n%d : ", G->vertices[i].label);
+        Vertex v = G->vertices[i];
+        printf("\tn%-3d: ", v.label);
+        prettyPrintInst(v.inst, 1);
+    }
+
+    printf("edges:\n");
+    for (int i = 0; i < G->size; ++i) {
+        Vertex v = G->vertices[i];
+        printf("\tn%-3d: ", v.label);
         Neighbors* nei = G->vertices[i].neighbors;
         if (nei->label == -1) {
             printf("{ }\n");
@@ -75,5 +85,12 @@ void printGraph(Graph* G) {
             printf(" }\n");
         }
     }
+
+    printf("weights:\n");
+    for (int i = 0; i < G->size; ++i) {
+        Vertex v = G->vertices[i];
+        printf("\tn%-3d: %d\n", v.label, v.distanceToRoot);
+    }
+    printf("\n");
 }
 

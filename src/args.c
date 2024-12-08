@@ -11,6 +11,7 @@
 static void set_default_options(options_t* options) {
     options->lexer = false;
     options->alloc = false;
+    options->sched = true;
     options->k = 5;
     options->prettyPrint = -1;
     options->tablePrint = false;
@@ -30,6 +31,9 @@ static void switch_options(int arg, options_t* options) {
             break;
         case 'a':
             options->alloc = true;
+            break;
+        case 's':
+            options->sched = true;
             break;
         case 'k':
             if (optarg) {
@@ -91,6 +95,7 @@ void options_parser (int argc, char* argv[], options_t* options) {
     {
         {"lexer", no_argument, 0, 'l'},
         {"alloc", no_argument, 0, 'a'},
+        {"sched", no_argument, 0, 's'},
         {"num-reg", required_argument, 0, 'k'},
         {"pretty-print", required_argument, 0, 'p'},
         {"table-print", no_argument, 0, 't'},
@@ -101,7 +106,7 @@ void options_parser (int argc, char* argv[], options_t* options) {
     while (true) {
 
         int option_index = 0;
-        arg = getopt_long(argc, argv, "lak:p:thd:", long_options, &option_index);
+        arg = getopt_long(argc, argv, "lask:p:thd:", long_options, &option_index);
 
         /* End of the options? */
         if (arg == -1) break;
@@ -122,6 +127,8 @@ void help(void) {
     fprintf(stdout, "Options:\n\n");
     fprintf(stdout, "\t-a, --alloc\n" 
                     "\t\tAllocates the input block of code. Pretty-prints the results by default.\n\n");
+    fprintf(stdout, "\t-s, --sched\n" 
+                    "\t\tComputes and prints the dependency graph for the input block of code, along with the latency-weighted distance to root.\n\n");
     fprintf(stdout, "\t-k n\n" 
                     "\t\tUse n registers when allocating the code.\n\n");
     fprintf(stdout, "\t-l, --lexer\n" 

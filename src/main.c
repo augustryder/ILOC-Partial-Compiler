@@ -26,15 +26,10 @@ int main(int argc, char* argv[]) {
 
     int blockSize = 0;
     Block* block = parse(file, &blockSize);
-    
-    Graph* G = buildDependencyGraph(block, blockSize);
-    prettyPrintBlock(block, 1);
-    printGraph(G);
 
     if (options.lexer) {
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
-        if (options.prettyPrint >= 0) prettyPrintBlock(block, options.prettyPrint);
     }
 
     if (options.alloc) {
@@ -43,12 +38,16 @@ int main(int argc, char* argv[]) {
         } else {
             error("Allocator needs at least 3 registers.");
         }
-        if (options.prettyPrint >= 0) {
-            prettyPrintBlock(block, options.prettyPrint);
-        }
-        else prettyPrintBlock(block, 2); // Default print physical registers
     }
 
+    if (options.sched) {
+        Graph* G = buildDependencyGraph(block, blockSize);
+        computeWeights(G);
+        printGraph(G);
+        freeGraph(G);
+    }
+
+    if (options.prettyPrint >= 0) prettyPrintBlock(block, options.prettyPrint);
     if (options.tablePrint) tPrintBlock(block);
     
     freeBlock(block);

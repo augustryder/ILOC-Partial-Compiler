@@ -1,4 +1,5 @@
 #pragma once
+#include "inst.h"
 
 typedef struct edges {
     int label;
@@ -7,6 +8,10 @@ typedef struct edges {
 
 typedef struct {
     int label;
+    int latency;
+    int indegree;
+    int distanceToRoot;
+    Inst* inst;
     Neighbors* neighbors; // linked list of out-going neighbors
 } Vertex;
 
@@ -22,6 +27,7 @@ Graph* initGraph(int size); // initializes a graph of 'size' vertices (labled 1.
 void freeGraph(Graph* G);
 void addEdge(int u, int v, Graph* G); // adds directed edge u -> v to graph G
 void printGraph(Graph* G);
+
 
 
 
