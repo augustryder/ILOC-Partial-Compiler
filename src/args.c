@@ -13,7 +13,7 @@ static void set_default_options(options_t* options) {
     options->alloc = false;
     options->k = 5;
     options->prettyPrint = -1;
-    options->tablePrint = true;
+    options->tablePrint = false;
     options->help = false;
     options->debug = 0;
 }

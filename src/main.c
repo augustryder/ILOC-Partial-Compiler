@@ -6,6 +6,8 @@
 #include "scanner.h"
 #include "block.h"
 #include "allocator.h"
+#include "graph.h"
+#include "scheduler.h"
 
 
 int main(int argc, char* argv[]) {
@@ -24,6 +26,10 @@ int main(int argc, char* argv[]) {
 
     int blockSize = 0;
     Block* block = parse(file, &blockSize);
+    
+    Graph* G = buildDependencyGraph(block, blockSize);
+    prettyPrintBlock(block, 1);
+    printGraph(G);
 
     if (options.lexer) {
         fseek(file, 0, SEEK_SET);
