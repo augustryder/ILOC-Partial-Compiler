@@ -9,7 +9,6 @@
 #include "graph.h"
 #include "scheduler.h"
 
-
 int main(int argc, char* argv[]) {
     options_t options;
     options_parser(argc, argv, &options);
@@ -31,6 +30,13 @@ int main(int argc, char* argv[]) {
         fseek(file, 0, SEEK_SET);
         printTokenStream(file);
     }
+    
+    if (options.sched) {
+        Graph* G = buildDependencyGraph(block, blockSize);
+        computeWeights(G);
+        printGraph(G);
+        freeGraph(G);
+    }
 
     if (options.alloc) {
         if (options.k >= 3) {
@@ -38,13 +44,6 @@ int main(int argc, char* argv[]) {
         } else {
             error("Allocator needs at least 3 registers.");
         }
-    }
-
-    if (options.sched) {
-        Graph* G = buildDependencyGraph(block, blockSize);
-        computeWeights(G);
-        printGraph(G);
-        freeGraph(G);
     }
 
     if (options.prettyPrint >= 0) prettyPrintBlock(block, options.prettyPrint);

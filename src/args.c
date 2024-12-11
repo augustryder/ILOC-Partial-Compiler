@@ -11,7 +11,7 @@
 static void set_default_options(options_t* options) {
     options->lexer = false;
     options->alloc = false;
-    options->sched = true;
+    options->sched = false;
     options->k = 5;
     options->prettyPrint = -1;
     options->tablePrint = false;
